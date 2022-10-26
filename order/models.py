@@ -75,7 +75,7 @@ class OrderDilivery(BaseModel):
         db_table = "order_dilivery"
 
 
-class Order_transaction(BaseModel):
+class OrderTransaction(BaseModel):
     payment = models.ForeignKey(
         OrderPayment,
         on_delete=models.CASCADE,
