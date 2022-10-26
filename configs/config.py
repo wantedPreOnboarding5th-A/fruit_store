@@ -12,6 +12,8 @@ with open(os.path.join(path, filename)) as f:
 class Config:
     databases: dict = yaml_settings["databases"]
     secrets: dict = yaml_settings["secrets"]
+    naver_pay: dict = yaml_settings["naver_pay"]
+    card_pay: dict = yaml_settings["card_pay"]
 
 
 config = Config()
