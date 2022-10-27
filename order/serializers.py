@@ -109,9 +109,12 @@ class PayReqSchema(serializers.Serializer):
             if self._validate_deposit_pay_required():
                 return validated
             else:
-                raise serializers.ValidationError(
-                    "deposit require cash_receipts_number, deposit_number, depositor"
-                )
+                if self._validate_deposit_pay_required():
+                    return validated
+                else:
+                    raise serializers.ValidationError(
+                        "deposit require cash_receipts_number, deposit_number, depositor"
+                    )
 
 
 class PayResSchema(serializers.Serializer):

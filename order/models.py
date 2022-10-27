@@ -46,10 +46,10 @@ class OrderPayment(BaseModel):
         db_column="order_id",
     )
     payment_type = models.CharField(max_length=1, null=False)
-    cash_receipts = models.CharField(max_length=1, null=False)
-    cash_receipts_number = models.IntegerField(null=False)
-    deposit_number = models.IntegerField(null=False)
-    depositor = models.CharField(max_length=20, null=False)
+    cash_receipts = models.CharField(max_length=1)
+    cash_receipts_number = models.IntegerField()
+    deposit_number = models.IntegerField()
+    depositor = models.CharField(max_length=20)
 
     class Meta:
         db_table = "order_payment"

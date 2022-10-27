@@ -59,7 +59,11 @@ class TransactionRepo:
         )
         with connection.cursor() as cursor:
             cursor.execute(query.get_sql())
-            return dict_fetchone(cursor)
+            payment = dict_fetchone(cursor)
+            if payment == None:
+                raise NotFoundError()
+            else:
+                return payment
 
 
 # Must To-do List 처리
