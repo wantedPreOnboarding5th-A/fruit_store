@@ -1,15 +1,14 @@
 from product.repository import (
-    CartPepo,
+    CartRepo,
     ProductRepo,
     ProductDescriptionRepo,
     ProductImgRepo,
-    ProductOptionRepo,
+    ProductOptionRepo
 )
 from .serilaizers import ProductRegisterSchema
 from .exceptions import NegativePriceError
 
-cartrepo = CartPepo()
-
+cartrepo = CartRepo()
 
 class ProductService:
     """상품 CRUD관련 service layer"""
@@ -124,17 +123,20 @@ class ProductService:
 
 
 class CartService:
-    def __init__(self):
-        pass
+    """장바구니 CRUD관련 service layer"""
+    
+    # 장바구니 전체 리스트 조회
+    def show_items(self, user) -> dict:
+        return cartrepo.find(user) 
 
-    def show_all_carts_items(self, user_id):
-        return cartrepo.get(user_id)
+    # 장바구니 상품 결제
+    def pay_items(self, user, product_ids) -> None:
+        cartrepo.create(user, product_ids)
+    
+    # 장바구니 상품 업데이트    
+    def update_items(self, user, product_id, data) -> None:
+        cartrepo.update(user, product_id, data)
 
-    def pay_cart_items(self, product_id=[]):
-        return JsonResponse(cartrepo.create(product_id))
-
-    def update_cart_items(self, product_id, params):
-        return JsonResponse(cartrepo.update(product_id, params))
-
-    def delete_cart_items(self, product_ids=[]):
-        return JsonResponse(cartrepo.delete(product_ids))
+    # 장바구니 상품 삭제
+    def delete_items(self, user, product_ids)-> None:
+        cartrepo.delete(user, product_ids)    

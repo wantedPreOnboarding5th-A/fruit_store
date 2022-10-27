@@ -24,7 +24,7 @@ from order.exceptions import (
     PaymentRequestFailedError,
     CanNotPayNonExistOrderError,
 )
-from product.repository import CartPepo
+from product.repository import CartRepo
 from provider.payment_provider import CardPayProvider, NaverPayProvider
 import user
 from utils.dict_helper import exclude_by_keys
@@ -144,7 +144,7 @@ class OrderManagementService:
         self.order_repo = OrderRepo()
         self.order_delivery_repo = OrderDeliveryRepo()
         self.product_out_repo = ProductOutRepo()
-        self.cart_repo = CartPepo()  # TODO 오타 수정
+        self.cart_repo = CartRepo()  # TODO 오타 수정
 
     # Validation 체크 : 상품 출고
     """

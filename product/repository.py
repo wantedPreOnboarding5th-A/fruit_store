@@ -9,6 +9,7 @@ from .serilaizers import (
 )
 from exceptions import NotFoundError
 from rest_framework.exceptions import ValidationError
+from order.enums import OrderStatusType
 
 
 class ProductRepo:
@@ -106,52 +107,58 @@ class ProductOptionRepo:
         return self.serializer(obj).data
 
 
-class CartPepo:  # TODO 오타 수정
-    def __init__(self):
+class CartRepo:
+    def __init__(self) -> None:
         self.serilaizer = CartSerializer
         self.model = Cart
         self.orderserilaier = OrderSerializer
-
-    def get(self, user_id):
+    
+    def find(self, user):
         try:
-            return self.serilaizer(self.model.objects.get(user=user_id).all()).data
+            return self.serilaizer(self.model.objects.filter(user=user), many = True).data
+        
         except self.model.DoesNotExist:
             raise NotFoundError
 
-    def create(self, product_id: list):
-
-        carts = [Cart.objects.get(product=Product.objects.get(id=i)) for i in product_id]
-
-        for cart in carts:
-            data = {
-                "user": cart.user,
-                "price": cart.price,
-                "dilivery_fee": 0 if cart.price >= 50000 else 5000,
-                "status": "F",
-            }
-            serialize = self.orderserilaier(data)
-            serialize.is_valid(raise_exception=True)
-            serialize.save()
-            return serialize.data
-
-    def update(self, product_id, params):
+    
+    def create(self, user, product_id):        
         try:
-            target = self.model.objects.get(id=product_id)
-            if target.user != params["user"]:
-                raise ValidationError("You can't update cart")
-            serializer = self.serilaizer(target, data=params, partial=True)
+
+            # 유저의 product_id에 해당하는 장바구니 객체  
+            carts = [Cart.objects.get(product = Product.objects.get(id = i), user = user) for i in product_id]
+            
+            for cart in carts:
+                data = {
+                    "user" : cart.user.id,
+                    "price":cart.price,
+                    "dilivery_fee":0 if cart.price >= 50000 else 5000, # 50000원 이상 결제시 배송비 무료
+                    "status": OrderStatusType.PAID_CONFIRMD.value
+                }
+                serialize = self.orderserilaier(data=data)
+                serialize.is_valid(raise_exception=True)
+                serialize.save()
+                cart.delete()
+
+        except Cart.DoesNotExist:
+            raise NotFoundError() 
+
+        
+    def update(self, user, product_id, data):
+        try:
+            target = self.model.objects.get(product = Product.objects.get(id = product_id), user = user)
+            serializer = self.serilaizer(target, data = data, partial = True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+        
         except self.model.DoesNotExist:
             raise NotFoundError
-        return serializer.data
+        
 
-    def delete(self, product_ids: list):
+    def delete(self, user, product_ids: list):
         try:
-            for product_id in product_ids:
-                target = self.model.objects.get(id=product_id)
+            for product_id in product_ids:    
+                target = self.model.objects.get(product = Product.objects.get(id = product_id), user = user )
                 target.delete()
-
-            return True
+        
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError 
