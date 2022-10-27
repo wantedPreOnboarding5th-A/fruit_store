@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from .models import Product, ProductDescription, ProductImg
-
+from .models import Product, ProductDescription, ProductImg, Cart
+from order.models import Order
 
 """
 상품 정보 테이블
@@ -54,3 +54,18 @@ class ProductResSchema(serializers.Serializer):
     sale_status = serializers.CharField(max_length=1)
     is_sale = serializers.IntegerField()
     price = serializers.PositiveIntegerField()  # serializers에 PositiveIntegerField가 존재하지 않음
+
+
+"""
+장바구니 정보 테이블
+"""
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = "__all__"
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = "__all__"
