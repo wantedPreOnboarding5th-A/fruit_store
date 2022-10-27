@@ -20,7 +20,7 @@ class ProductRepo:
 
     def upsert(self, data: dict) -> dict:
         obj, created = self.model.objects.update_or_create(
-            defaults=data,  # default의 의미??
+            defaults=data,
         )
         return self.serilaizer(obj).data
 
