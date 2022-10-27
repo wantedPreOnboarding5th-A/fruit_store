@@ -1,5 +1,5 @@
 import pytest
-from order.serilaizers import PayReqSchema
+from order.service import PayReqSchema
 from rest_framework import serializers
 from order.enums import PaymentType
 
