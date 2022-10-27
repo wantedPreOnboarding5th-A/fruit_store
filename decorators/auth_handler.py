@@ -1,7 +1,4 @@
 from functools import wraps
-from exceptions import CustomBaseExecption
-from django.http import JsonResponse
-from rest_framework import status
 from provider.auth_provider import auth_provider
 from exceptions import NotAuthorizedError
 
