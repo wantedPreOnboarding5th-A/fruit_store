@@ -26,7 +26,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
         field = "__all__"
 
 
-class ProductDetailSchema(serializers.Serializer):
+class ProductRegisterSchema(serializers.Serializer):
     """
     상품 등록 및 상세 조회 기능 요청에 필요한 파라미터 정의
     """
