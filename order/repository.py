@@ -1,4 +1,4 @@
-from order.serializers import OrderListSerializer, OrderSerializer, ProductOutSerializer
+from order.serializers import OrderSerializer, ProductOutSerializer
 from order.models import Order, ProductOut
 
 # Must To-do List형에 대해
@@ -14,7 +14,6 @@ class OrderRepo:
     def ___init___(self) -> None:
         self.model = Order
         self.serializer = OrderSerializer
-        self.list_serializer = OrderListSerializer
 
         """
         user_id 를 인자로 받아 리스트를 반환
