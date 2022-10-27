@@ -13,7 +13,7 @@ Detail page에 들어갈 정보 -> 단일만 조회  = OrderTransaction, OrderPa
 # Question : Serialize에서 DB의 엔티티를 조회시 하위 엔티티들은 어떻게 처리되는가.
 # Question : Serialize 할때 필드명을 명시하는게 좋은가
 # Question : Order에는 Total fee, Total Price (장바구니 합계를 저장)
-# Question : cascade
+# Question :
 
 """
 단일 Order
@@ -27,7 +27,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 """
-Order List
+Delivery Status for Order List
 """
 
 
@@ -49,17 +49,6 @@ class ProductOutSerializer(serializers.ModelSerializer):
 
 
 """
-지불정보
-"""
-
-
-class OrderPaymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderPayment
-        fields = "__all__"
-
-
-"""
 배송정보
 """
 
@@ -67,15 +56,4 @@ class OrderPaymentSerializer(serializers.ModelSerializer):
 class OrderDeliverySerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDeilivery
-        fields = "__all__"
-
-
-"""
-결제정보
-"""
-
-
-class OrderTransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderTransaction
         fields = "__all__"
