@@ -62,9 +62,6 @@ class TransactionRepo:
             return dict_fetchone(cursor)
 
 
-# Must To-do List 처리
-# Must To-do 전역 Exception 클래스 파일 들어오면 Exception 처리
-
 """
 OrderRepository
 """
@@ -134,7 +131,7 @@ Product 출고 Repo
 
 
 class ProductOutRepo:
-    def ___init___(self) -> None:
+    def __init__(self) -> None:
         self.model = ProductOut
         self.serializer = ProductOutSerializer
 
@@ -184,7 +181,7 @@ class ProductOutRepo:
 
 
 class OrderDeliveryRepo:
-    def ___init___(self) -> None:
+    def __init__(self) -> None:
         self.model = Order
         self.serializer = OrderSerializer
 
