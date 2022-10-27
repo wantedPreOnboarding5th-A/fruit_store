@@ -11,7 +11,7 @@ class Order(BaseModel):
         db_column="user_id",
     )
     price = models.IntegerField(null=False)
-    dilivery_fee = models.IntegerField(null=False)
+    dilivery_fee = models.IntegerField(null=False)  # TODO 오타수정 delivery -> delivery
     status = models.CharField(max_length=1)
 
     class Meta:
@@ -30,7 +30,7 @@ class ProductOut(BaseModel):
         db_column="order_id",
     )
     price = models.IntegerField(null=False)
-    delivery_fee = models.IntegerField(null=False)
+    delivery_fee = models.IntegerField(null=False)  # TODO 오타수정 delivery -> delivery
     options = models.JSONField(null=False)
     status = models.CharField(max_length=1, null=False)
     trace_no = models.CharField(max_length=100)
@@ -72,7 +72,7 @@ class OrderDeilivery(BaseModel):
     address_detail = models.CharField(max_length=100)
 
     class Meta:
-        db_table = "order_dilivery"
+        db_table = "order_dilivery"  # -> delivery
 
 
 class OrderTransaction(BaseModel):
