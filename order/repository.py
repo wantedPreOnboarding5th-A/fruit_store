@@ -59,7 +59,11 @@ class TransactionRepo:
         )
         with connection.cursor() as cursor:
             cursor.execute(query.get_sql())
-            return dict_fetchone(cursor)
+            payment = dict_fetchone(cursor)
+            if payment == None:
+                raise NotFoundError()
+            else:
+                return payment
 
 
 """
@@ -68,7 +72,7 @@ OrderRepository
 
 
 class OrderRepo:
-    def ___init___(self) -> None:
+    def __init__(self) -> None:
         self.model = Order
         self.serializer = OrderSerializer
 
@@ -90,7 +94,7 @@ class OrderRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError
 
     def create(self, params: dict) -> dict:
         """create order : 인자로 딕셔너리를 받습니다."""

@@ -1,6 +1,13 @@
 from rest_framework import serializers
 
-from order.models import Order, OrderDeilivery, OrderPayment, OrderTransaction, ProductOut
+from order.models import (
+    Order,
+    OrderDeilivery,
+    OrderPayment,
+    OrderTransaction,
+    ProductOut,
+)
+from order.enums import PaymentType, CashReciptsType
 
 """
 단일 Order
@@ -80,6 +87,7 @@ class OrderDeliverySerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDeilivery
         fields = "__all__"
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 
@@ -88,6 +96,8 @@ class OrderDeliverySerializer(serializers.ModelSerializer):
 #     """
 #     Service 기능 요청을 위한 배송정보 scheme
 #     """
+=======
+>>>>>>> f52d6d341de81cba820ead46ee26c69318d3e348
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -148,9 +158,18 @@ class PayReqSchema(serializers.Serializer):
             if self._validate_deposit_pay_required():
                 return validated
             else:
+<<<<<<< HEAD
                 raise serializers.ValidationError(
                     "deposit require cash_receipts_number, deposit_number, depositor"
                 )
+=======
+                if self._validate_deposit_pay_required():
+                    return validated
+                else:
+                    raise serializers.ValidationError(
+                        "deposit require cash_receipts_number, deposit_number, depositor"
+                    )
+>>>>>>> f52d6d341de81cba820ead46ee26c69318d3e348
 
 
 class PayResSchema(serializers.Serializer):
@@ -171,4 +190,7 @@ class PayResSchema(serializers.Serializer):
     depositor = serializers.CharField(max_length=20, required=False, allow_null=True)
     updated_at = serializers.DateTimeField()
     created_at = serializers.DateTimeField()
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> f52d6d341de81cba820ead46ee26c69318d3e348
