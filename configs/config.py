@@ -14,6 +14,7 @@ class Config:
     secrets: dict = yaml_settings["secrets"]
     naver_pay: dict = yaml_settings["naver_pay"]
     card_pay: dict = yaml_settings["card_pay"]
+    aws_s3: dict = yaml_settings["aws"]
 
 
 config = Config()
