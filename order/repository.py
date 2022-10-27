@@ -84,12 +84,12 @@ class OrderRepo:
         """
 
     def find_order_by_user_id(self, user_id: int) -> dict:
-        
+
         self.serializer(self.model.objects.get(id=user_id)).data
         try:
-            return 
+            return
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()
 
         """
         Read Order 
@@ -119,11 +119,12 @@ class OrderRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()
 
         """
         Deprecated : Order 삭제 대신 상태 컬럼 업데이트로 변경
         """
+
     def delete(
         self,
         order_id: int,
@@ -135,11 +136,11 @@ class OrderRepo:
             entity.delete()
             return True
         except self.model.DoesNotExist:
-            raise  NotFoundError()
-    
-    def find_order(
-        
-    )
+            raise NotFoundError()
+
+    def find_order():
+        pass
+
 
 """
 Product 출고 Repo
@@ -159,7 +160,7 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()
         """
         Read OrderProduct by Product_id
         """
@@ -168,12 +169,12 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=product_id)).data
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()
 
         """
         create Order
         """
-    
+
     def create(self, params: dict) -> dict:
         Serializer = self.serializer(data=params)
         Serializer.is_valid(raise_exception=True)  # 유효성 체크
@@ -190,7 +191,7 @@ class ProductOutRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()
 
 
 class OrderDeliveryRepo:
@@ -206,7 +207,7 @@ class OrderDeliveryRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()
 
         """
         create Order
@@ -228,7 +229,7 @@ class OrderDeliveryRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()
 
         """
         Delete Order
@@ -243,4 +244,4 @@ class OrderDeliveryRepo:
             entity.delete()
             return True
         except self.model.DoesNotExist:
-            raise  NotFoundError()
+            raise NotFoundError()

@@ -167,7 +167,7 @@ class OrderManagementService:
         zip_code: int,
         address: string,
         address_detail: string,
-    ):
+    ) -> dict:
         """
         price 는 인수로 받지 않습니다. 장바구니에서 계산.
         모든 권한이 접근 가능
@@ -275,9 +275,10 @@ class OrderManagementService:
         return res
 
     def _get_order_list(user_id: int) -> list:
+
         pass
 
-    def _deilvery_status_update(order_id: int, new_status: enum):
+    def _deilvery_status_update(order_id: int, new_status: enum) -> dict:
         order = order_repo.get_by_order_id(order_id=order_id)
         order_status_now = order["status"]
         order_status_new = new_status  # enum validation 작성
