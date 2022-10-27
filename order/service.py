@@ -1,5 +1,5 @@
 from order.repository import PaymentRepo, TransactionRepo
-from order.serilaizers import PayReqSchema, PayResSchema
+from order.serializers import PayReqSchema, PayResSchema
 from order.enums import TransactionStatusType, PaymentType
 from order.exceptions import AlreadyPaidError, PaymentRequestFailed
 from provider.payment_provider import CardPayProvider, NaverPayProvider
@@ -20,7 +20,10 @@ class PaymentService:
 
     def _validate_payemnt_is_paid(self, order_id: int) -> bool:
         transaction = transaction_repo.get_by_order_id(order_id=order_id)
-        return transaction["status"] == TransactionStatusType.PAID_FINISHED.value
+        return (
+            transaction != None
+            and transaction["status"] == TransactionStatusType.PAID_FINISHED.value
+        )
 
     def _get_payment_status(self, is_success: bool) -> str:
         return (
@@ -64,11 +67,12 @@ class PaymentService:
         }
         params = PayReqSchema(data=data)
         params.is_valid(raise_exception=True)
+        # TODO: 존재하는 order인지 확인
 
         # 이미 성공한 결제인지 확인
         is_already_paid = self._validate_payemnt_is_paid(order_id)
         if is_already_paid:
-            raise AlreadyPaidError
+            raise AlreadyPaidError()
 
         # payment에 따른 provider 호출
         payment_provider = self.payment_porvider_map[payment_type]
@@ -77,6 +81,7 @@ class PaymentService:
         transaction_status = self._get_payment_status(is_success)
 
         # TODO: payment와 transaction upsert atomic 보장
+        amount = data.pop("amount")
         payment = payment_repo.upsert(order_id, data)
         payment_id = payment["id"]
         transaction = transaction_repo.upsert(
@@ -95,4 +100,4 @@ class PaymentService:
             )
         else:
             # 결제 요청이 실패한 경우 request가 실패한 것으로 간주, db에 결과 반영 후 에러 response
-            raise PaymentRequestFailed
+            raise PaymentRequestFailed()
