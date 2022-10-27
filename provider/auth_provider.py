@@ -10,6 +10,7 @@ from exceptions import (
 )
 from user.enums import UserType
 from datetime import datetime
+import bcrypt
 
 user_repo = UserRepo()
 
@@ -21,6 +22,12 @@ class AuthProvider:
 
     def _get_curr_sec(self):
         return datetime.now().timestamp()
+
+    def hashpw(self, password: str):
+        return bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt()).decode("utf8")
+
+    def checkpw(self, password: str, hashed: str):
+        return bcrypt.checkpw(password.encode("utf8"), hashed.encode("utf8"))
 
     def _decode(self, token: str):
         decoded = jwt.decode(token, self.key, algorithms=["HS256"])
@@ -40,8 +47,11 @@ class AuthProvider:
 
     def login(self, email: str, password: str):
         try:
-            user = user_repo.get_by_email_and_pwd(email=email, password=password)
-            return self.create_token(user["id"])
+            user = user_repo.get_by_email(email=email)
+            if self.checkpw(password, user["password"]):
+                return self.create_token(user["id"])
+            else:
+                raise NotFoundUserError()
         except Exception as e:
             if isinstance(e, NotFoundError):
                 raise NotFoundUserError()

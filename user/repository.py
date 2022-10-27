@@ -14,11 +14,9 @@ class UserRepo:
         except self.model.DoesNotExist:
             raise NotFoundError
 
-    def get_by_email_and_pwd(self, email: str, password: str):
+    def get_by_email(self, email: str):
         try:
-            return UserSerializer(
-                self.model.objects.get(email=email, password=password)
-            ).data
+            return UserSerializer(self.model.objects.get(email=email)).data
         except self.model.DoesNotExist:
             raise NotFoundError
 
