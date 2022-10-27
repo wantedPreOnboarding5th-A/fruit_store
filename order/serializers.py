@@ -20,15 +20,34 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class OrederReqSchema(serializers.Serializer):
+# order Create Request Schema
+class OrderCreateReqSchema(serializers.Serializer):
     """
     Service 기능 요청을 위한 주문 요청 scheme
     """
 
+    # TODO 오타수정 delivery -> delivery
+    dilivery_fee = serializers.IntegerField()
+
+    # 이하는 배송정보에 들어갈 내용
+    trace_no = serializers.CharField()
+    customer_name = serializers.CharField()
+    customer_phone = serializers.CharField()
+    customer_email = serializers.CharField()
+    delivery_name = serializers.CharField()
+    delivery_phone = serializers.CharField()
+    delivery_memo = serializers.CharField()
+    zip_code = serializers.CharField()
+    address = serializers.CharField()
+    address_detail = serializers.CharField()
+
+
+class OrderResSchema(serializers.Serializer):
+    """
+    Service 기능 주문 응답 scheme
+    """
+
     order_id = serializers.IntegerField()
-    # Total Price에 대한 의문 : 프론트에서 넘겨준 값을 검증하는식
-    # 아니면 서버단에서 자체 계산후 산출하는방식 즉 받아야하나 말아야하나.
-    # 일단은 받는쪽으로
     price = serializers.IntegerField()
     # TODO 오타수정 delivery -> delivery
     dilivery_fee = serializers.IntegerField()
@@ -45,6 +64,12 @@ class OrederReqSchema(serializers.Serializer):
     zip_code = serializers.CharField()
     address = serializers.CharField()
     address_detail = serializers.CharField()
+
+
+class ProductOutReqSchema(serializers.Serializer):
+    """
+    Service 요청에 대한 출고정보 Scheme
+    """
 
 
 class OrderResSchema(serializers.Serializer):
@@ -87,17 +112,12 @@ class OrderDeliverySerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDeilivery
         fields = "__all__"
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 
 
 # class OrderDeliveryReqSchema(serializers.Serializer):
 #     """
 #     Service 기능 요청을 위한 배송정보 scheme
 #     """
-=======
->>>>>>> f52d6d341de81cba820ead46ee26c69318d3e348
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -158,18 +178,9 @@ class PayReqSchema(serializers.Serializer):
             if self._validate_deposit_pay_required():
                 return validated
             else:
-<<<<<<< HEAD
                 raise serializers.ValidationError(
                     "deposit require cash_receipts_number, deposit_number, depositor"
                 )
-=======
-                if self._validate_deposit_pay_required():
-                    return validated
-                else:
-                    raise serializers.ValidationError(
-                        "deposit require cash_receipts_number, deposit_number, depositor"
-                    )
->>>>>>> f52d6d341de81cba820ead46ee26c69318d3e348
 
 
 class PayResSchema(serializers.Serializer):
@@ -190,7 +201,3 @@ class PayResSchema(serializers.Serializer):
     depositor = serializers.CharField(max_length=20, required=False, allow_null=True)
     updated_at = serializers.DateTimeField()
     created_at = serializers.DateTimeField()
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> f52d6d341de81cba820ead46ee26c69318d3e348

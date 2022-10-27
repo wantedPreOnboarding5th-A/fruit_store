@@ -4,10 +4,11 @@ from .serilaizers import (
     ProductDetailSerializer,
     ProductImageSerializer,
     CartSerializer,
-    OrderSerializer
+    OrderSerializer,
 )
 from exceptions import NotFoundError
 from rest_framework.exceptions import ValidationError
+
 
 class ProductRepo:
     def __init__(self) -> None:
@@ -75,29 +76,28 @@ class ProductImageRepo:
         return self.serilaizer(self.model.objects.get(id=product_id)).data
 
 
-class CartPepo:
+class CartPepo:  # TODO 오타 수정
     def __init__(self):
         self.serilaizer = CartSerializer
         self.model = Cart
         self.orderserilaier = OrderSerializer
-    
+
     def get(self, user_id):
         try:
-            return self.serilaizer(self.model.objects.get(user= user_id).all()).data
+            return self.serilaizer(self.model.objects.get(user=user_id).all()).data
         except self.model.DoesNotExist:
             raise NotFoundError
 
-    def create(self, product_id : list):
-        
-        carts = [Cart.objects.get(product = Product.objects.get(id = i)) for i in product_id]
-        
-        
+    def create(self, product_id: list):
+
+        carts = [Cart.objects.get(product=Product.objects.get(id=i)) for i in product_id]
+
         for cart in carts:
             data = {
-                "user" : cart.user,
-                "price":cart.price,
-                "dilivery_fee":0 if cart.price >= 50000 else 5000,
-                "status":"F"
+                "user": cart.user,
+                "price": cart.price,
+                "dilivery_fee": 0 if cart.price >= 50000 else 5000,
+                "status": "F",
             }
             serialize = self.orderserilaier(data)
             serialize.is_valid(raise_exception=True)
@@ -106,10 +106,10 @@ class CartPepo:
 
     def update(self, product_id, params):
         try:
-            target = self.model.objects.get(id = product_id)
+            target = self.model.objects.get(id=product_id)
             if target.user != params["user"]:
                 raise ValidationError("You can't update cart")
-            serializer = self.serilaizer(target, data = params, partial = True)
+            serializer = self.serilaizer(target, data=params, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
@@ -118,11 +118,10 @@ class CartPepo:
 
     def delete(self, product_ids: list):
         try:
-            for product_id in product_ids:    
-                target = self.model.objects.get(id =product_id )
+            for product_id in product_ids:
+                target = self.model.objects.get(id=product_id)
                 target.delete()
-            
-            return True         
+
+            return True
         except self.model.DoesNotExist:
             raise NotFoundError
-
