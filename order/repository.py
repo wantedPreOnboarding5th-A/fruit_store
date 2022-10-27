@@ -84,7 +84,7 @@ class OrderRepo:
         try:
             return self.serializer(self.model.objects.get(id=user_id)).data
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
 
         """
         Read Order 
@@ -94,7 +94,7 @@ class OrderRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
 
     def create(self, params: dict) -> dict:
         """create order : 인자로 딕셔너리를 받습니다."""
@@ -113,7 +113,7 @@ class OrderRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
 
     def delete(
         self,
@@ -126,7 +126,7 @@ class OrderRepo:
             entity.delete()
             return True
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
 
 
 """
@@ -150,7 +150,7 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
         """
         Read OrderProduct by Product_id
         """
@@ -159,7 +159,7 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=product_id)).data
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
 
         """
         create Order
@@ -181,7 +181,7 @@ class ProductOutRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
 
 
 class OrderDeliveryRepo:
@@ -197,7 +197,7 @@ class OrderDeliveryRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
 
         """
         create Order
@@ -219,7 +219,7 @@ class OrderDeliveryRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()
 
         """
         Delete Order
@@ -234,4 +234,4 @@ class OrderDeliveryRepo:
             entity.delete()
             return True
         except self.model.DoesNotExist:
-            raise  # Excepion class Not def yet "not exist"
+            raise NotFoundError()

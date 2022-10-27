@@ -1,3 +1,5 @@
+import json
+import string
 from order.repository import (
     OrderDeliveryRepo,
     OrderRepo,
@@ -6,7 +8,7 @@ from order.repository import (
     TransactionRepo,
 )
 from exceptions import NotFoundError
-from order.serializers import PayReqSchema, PayResSchema
+from order.serializers import OrderReqSchema, OrederReqSchema, PayReqSchema, PayResSchema
 from order.enums import TransactionStatusType, PaymentType
 from order.exceptions import (
     AlreadyPaidError,
@@ -126,12 +128,12 @@ class PaymentService:
             raise PaymentRequestFailedError()
 
 
-order_repo = OrderRepo()
-order_delivery_repo = OrderDeliveryRepo()
-product_out_repo = ProductOutRepo()
-
-
 class OrderManagementService:
+    order_repo = OrderRepo()
+    order_delivery_repo = OrderDeliveryRepo()
+    product_out_repo = ProductOutRepo()
+
+    order_req = OrderReqSchema()
 
     # Validation 체크 : 상품 출고
     """
@@ -140,14 +142,66 @@ class OrderManagementService:
 
     """
 
-    def order_create_(product_id: int, data):
+    def _create_order(
+        self,
+        user_id: int,
+        order_id: int,
+        delivery_fee: int,
+        trace_no: string,
+        customer_name: string,
+        customer_phone: string,
+        delivery_name: string,
+        delivery_phone: string,
+        delivery_memo: string,
+        zip_code: int,
+        address: string,
+        address_detail: string,
+    ):
+        """price 는 인수로 받지 않습니다. 장바구니에서 계산."""
+        # todo 장바구니 리스트 끌어오기 params : user_id
+        # dilivery -> delivery
+        # Mock Data
+        cart_list = [
+            {
+                "user_id": 1,
+                "product_id": 1,
+                "price": 1000,
+                "dilivery_fee": 2000,
+                "options": {"amount": 2},
+            },
+            {
+                "user_id": 1,
+                "product_id": 2,
+                "price": 3000,
+                "dilivery_fee": 3000,
+                "options": {"amount": 2},
+            },
+        ]
+
+        for cart in cart_list:
+            # price , options[amount]
+            price = cart["price"] * cart["options"]["amount"]
+            total_price = total_price + price
+
+        for cart in cart_list:
+            total_delivery_fee = total_delivery_fee + cart["dilivery_fee"]
+
+        """
+        장바구니 항목 : uid 를 param 으로 product: price:...
+        """
+        # Todo Req schema 로 req validation
         pass
 
-    def order_create_by_cart():
+    def _get_order():
+
         pass
 
-    def deilvery_update():
+    def _deilvery_update():
         pass
 
-    def cancle_order():
+    def _payment_update(self, order_id: int):
+
+        order_repo.get_by_order_id(order_id)
+
+    def _cancle_order():
         pass
