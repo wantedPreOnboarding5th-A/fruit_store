@@ -79,7 +79,7 @@ class OrderRepo:
         user_id 를 인자로 받아 리스트를 반환
         """
 
-    def get(self, user_id: int) -> dict:
+    def get_by_user_id(self, user_id: int) -> dict:
         try:
             return self.serializer(self.model.objects.get(id=user_id)).data
         except self.model.DoesNotExist:
@@ -89,7 +89,7 @@ class OrderRepo:
         Read Order 
         """
 
-    def get(self, order_id: int) -> dict:
+    def get_by_order_id(self, order_id: int) -> dict:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
