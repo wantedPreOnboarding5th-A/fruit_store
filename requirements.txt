@@ -13,6 +13,7 @@ pathspec==0.10.1
 platformdirs==2.5.2
 pluggy==1.0.0
 pydantic==1.10.2
+PyJWT==2.6.0
 pyparsing==3.0.9
 PyPika==0.48.9
 pytest==7.2.0
