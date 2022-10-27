@@ -84,3 +84,8 @@
     결제관리: /payments/
     
     카트관리:/carts/
+    
+    주문, 배송 상태 흐름도
+    ![image](https://user-images.githubusercontent.com/101803254/198198485-d37749f8-4090-4c6e-8519-d2f22c7a2326.png)
+
+  
