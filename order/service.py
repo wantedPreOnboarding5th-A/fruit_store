@@ -274,9 +274,8 @@ class OrderManagementService:
 
         return res
 
-    def _get_order_list(user_id: int) -> list:
-
-        pass
+    # def _get_order_list(user_id: int) -> list:
+    #     pass
 
     def _deilvery_status_update(order_id: int, new_status: enum) -> dict:
         order = order_repo.get_by_order_id(order_id=order_id)

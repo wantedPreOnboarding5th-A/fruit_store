@@ -234,14 +234,3 @@ class OrderDeliveryRepo:
         """
         Delete Order
         """
-
-    def delete(
-        self,
-        order_id: int,
-    ):
-        try:
-            entity = self.model.objects.get(id=order_id)
-            entity.delete()
-            return True
-        except self.model.DoesNotExist:
-            raise NotFoundError()
