@@ -67,13 +67,6 @@
 - 모델링 및 ERD
     ![fruitstore_(1)](https://user-images.githubusercontent.com/101803254/197968824-39355715-da18-40fd-bc62-c4860c65cd44.png)
     
-    ## URL
-    
-    
-    
-    ![%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2022-10-26_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_4 53 56](https://user-images.githubusercontent.com/101803254/197968881-c350606d-b575-453a-8690-1778c4dfbb6c.png)
-    
-    ref: [https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design)
     
     유저관리 : /users/
     
@@ -85,7 +78,7 @@
     
     카트관리:/carts/
     
-    주문, 배송 상태 흐름도
+    ## 주문, 배송 상태 흐름도
     ![image](https://user-images.githubusercontent.com/101803254/198198485-d37749f8-4090-4c6e-8519-d2f22c7a2326.png)
 
   
