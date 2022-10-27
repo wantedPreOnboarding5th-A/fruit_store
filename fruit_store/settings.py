@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "order.apps.OrderConfig",
     "product.apps.ProductConfig",
     "user.apps.UserConfig",
-
 ]
 
 MIDDLEWARE = [
@@ -89,7 +88,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -130,3 +128,10 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+NAVER_PAY_CLIENT_ID = config.naver_pay["client_id"]
+NAVER_PAY_MODE = config.naver_pay["mode"]
+NAVER_PAY_MERCHANT_USER_KEY = config.naver_pay["merchantUserKey"]
+NAVER_PAY_MERCHANT_PAY_KEY = config.naver_pay["merchantPayKey"]
+
+CARD_PAY_MEMBER_ID = config.card_pay["member_id"]
