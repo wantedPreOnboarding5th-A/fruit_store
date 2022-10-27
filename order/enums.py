@@ -15,3 +15,13 @@ class CashReciptsType(BaseEnum):
 class TransactionStatusType(BaseEnum):
     PAID_FINISHED = "T"
     PAID_FAILED = "F"
+
+
+class OrderStatusType(BaseEnum):
+    PAID_CONFIRMD = "P"
+    PAID_FALLED = "F"
+
+    DELIVERY_STARTED = "D"
+    DELIVERY_FINISHED = "Y"
+    DELIVERY_FALLED = "N"
+    ORDER_CANCLED = "C"
