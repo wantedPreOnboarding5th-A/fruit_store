@@ -66,6 +66,9 @@ class TransactionRepo:
                 return payment
 
 
+# Must To-do List 처리
+# Must To-do 전역 Exception 클래스 파일 들어오면 Exception 처리
+
 """
 OrderRepository
 """
@@ -84,7 +87,7 @@ class OrderRepo:
         try:
             return self.serializer(self.model.objects.get(id=user_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
 
         """
         Read Order 
@@ -108,12 +111,12 @@ class OrderRepo:
         """
         try:
             entity = self.model.objects.get(id=order_id)
-            # To-do 유효성 체크 업데이트 하고자 하는 id 작성
+            # TODO 유효성 체크 id 동일한지
             serializer = self.serializer(entity, data=params, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
 
     def delete(
         self,
@@ -126,7 +129,7 @@ class OrderRepo:
             entity.delete()
             return True
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
 
 
 """
@@ -139,9 +142,6 @@ class ProductOutRepo:
         self.model = ProductOut
         self.serializer = ProductOutSerializer
 
-        # 출고현황을 리스트로 출력해주는 api가 필요할까 (요구사항에는 없다.)
-        # self.list_serializer = OrderListSerializer
-
         """
         Read OrderProduct by order_id
         """
@@ -150,7 +150,7 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
         """
         Read OrderProduct by Product_id
         """
@@ -159,7 +159,7 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=product_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
 
         """
         create Order
@@ -181,7 +181,7 @@ class ProductOutRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
 
 
 class OrderDeliveryRepo:
@@ -197,7 +197,7 @@ class OrderDeliveryRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
 
         """
         create Order
@@ -219,7 +219,7 @@ class OrderDeliveryRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
 
         """
         Delete Order
@@ -234,4 +234,4 @@ class OrderDeliveryRepo:
             entity.delete()
             return True
         except self.model.DoesNotExist:
-            raise NotFoundError()
+            raise  # Excepion class Not def yet "not exist"
