@@ -1,4 +1,10 @@
-from order.repository import OrderDeliveryRepo, OrderRepo, PaymentRepo, ProductOutRepo, TransactionRepo
+from order.repository import (
+    OrderDeliveryRepo,
+    OrderRepo,
+    PaymentRepo,
+    ProductOutRepo,
+    TransactionRepo,
+)
 from order.serializers import PayReqSchema, PayResSchema
 from order.enums import TransactionStatusType, PaymentType
 from order.exceptions import AlreadyPaidError, PaymentRequestFailed
@@ -35,9 +41,7 @@ class PaymentService:
             "transaction_id": transaction["id"],
         }
         payment.pop("order")
-        transaction = exclude_by_keys(
-            set(["id", "created_at", "updated_at"]), transaction
-        )
+        transaction = exclude_by_keys(set(["id", "created_at", "updated_at"]), transaction)
         d = {**data, **payment, **transaction}
         serializer = PayResSchema(data=d)
         serializer.is_valid(raise_exception=True)
@@ -90,37 +94,34 @@ class PaymentService:
         )
 
         if is_success:
-            return self._parse_payment_with_transaction(
-                transaction=transaction, payment=payment
-            )
+            return self._parse_payment_with_transaction(transaction=transaction, payment=payment)
         else:
             # 결제 요청이 실패한 경우 request가 실패한 것으로 간주, db에 결과 반영 후 에러 response
             raise PaymentRequestFailed
+
 
 order_repo = OrderRepo()
 order_delivery_repo = OrderDeliveryRepo()
 product_out_repo = ProductOutRepo()
 
 
-        """
-        작업흐름 : 주문생성(결제대기) -> 결제완료(업데이트) ->출고요청(업데이트)
-                   ->출고완료(배송중) -> 이하는 배송 Status 꾸준히 업데이트
-        """
-        
 class OrderManagementService:
-    
-    #Validation 체크 : 상품 출고
+
+    # Validation 체크 : 상품 출고
     """
     단일 품목으로 주문받는경우 수량은 productOut options에서 끌어오기
-    product repo에서 상품을 끌어오기 
-    
-    폼별로 따로 들어온다고 가정하고 모델별 서비스 작성.
+    product repo에서 상품을 끌어오기
+
     """
+
     def order_create_(product_id: int, data):
-        
+        pass
+
     def order_create_by_cart():
-    
-    def deilvery_update()
-    
-        
-    
+        pass
+
+    def deilvery_update():
+        pass
+
+    def cancle_order():
+        pass
