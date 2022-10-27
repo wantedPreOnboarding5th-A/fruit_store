@@ -11,7 +11,6 @@ from pypika import MySQLQuery, Table
 from django.db import connection
 from utils.pypika_helper import dict_fetchone
 
-
 payment_table = Table("order_payment")
 transaction_table = Table("order_transacton")
 
@@ -20,6 +19,7 @@ class PaymentRepo:
     def __init__(self) -> None:
         self.serilaizer = PaymentSerializer
         self.model = OrderPayment
+
     def get(self, payment_id: int) -> dict:
         try:
             return self.serilaizer(self.model.objects.get(id=payment_id)).data
@@ -145,7 +145,7 @@ class ProductOutRepo:
         Read OrderProduct by order_id
         """
 
-    def getByOrderId(self, order_id: int) -> dict:
+    def get_by_order_id(self, order_id: int) -> dict:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
@@ -154,7 +154,7 @@ class ProductOutRepo:
         Read OrderProduct by Product_id
         """
 
-    def getByOrderId(self, product_id: int) -> dict:
+    def get_by_product_id(self, product_id: int) -> dict:
         try:
             return self.serializer(self.model.objects.get(id=product_id)).data
         except self.model.DoesNotExist:
@@ -187,7 +187,6 @@ class OrderDeliveryRepo:
     def ___init___(self) -> None:
         self.model = Order
         self.serializer = OrderSerializer
-        self.list_serializer = OrderListSerializer
 
         """
         Read OrderDelivery 
