@@ -138,3 +138,4 @@ CARD_PAY_MEMBER_ID = config.card_pay["member_id"]
 
 # JWT SECRET
 JWT_KEY = config.token["scret"]
+JWT_EXPIRE_TIME = config.token["expire_sec"]

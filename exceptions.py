@@ -26,3 +26,9 @@ class NoPermssionError(CustomBaseExecption):
     def __init__(self):
         self.msg = "Unauthorized request. Please check your permission"
         self.status = status.HTTP_401_UNAUTHORIZED
+
+
+class TokenExpiredError(CustomBaseExecption):
+    def __init__(self):
+        self.msg = "Login time expired. Please login again"
+        self.status = status.HTTP_403_FORBIDDEN

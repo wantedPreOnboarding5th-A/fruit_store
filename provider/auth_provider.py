@@ -6,8 +6,10 @@ from exceptions import (
     NotFoundError,
     NotFoundUserError,
     NotAuthorizedError,
+    TokenExpiredError,
 )
 from user.enums import UserType
+from datetime import datetime
 
 user_repo = UserRepo()
 
@@ -15,9 +17,25 @@ user_repo = UserRepo()
 class AuthProvider:
     def __init__(self):
         self.key = settings.JWT_KEY
+        self.expire_sec = settings.JWT_EXPIRE_TIME
 
-    def create_token(self, user_id: str):
-        encoded_jwt = jwt.encode({"id": user_id}, self.key, algorithm="HS256")
+    def _get_curr_sec(self):
+        return datetime.now().timestamp()
+
+    def _decode(self, token: str):
+        decoded = jwt.decode(token, self.key, algorithms=["HS256"])
+        if decoded["exp"] <= self._get_curr_sec():
+            raise TokenExpiredError
+        else:
+            return decoded
+
+    def create_token(self, user_id: str, is_expired: bool = False):
+        exp = 0 if is_expired else self._get_curr_sec() + self.expire_sec
+        encoded_jwt = jwt.encode(
+            {"id": user_id, "exp": exp},
+            self.key,
+            algorithm="HS256",
+        )
         return {"access": encoded_jwt}
 
     def login(self, email: str, password: str):
@@ -30,8 +48,12 @@ class AuthProvider:
             else:
                 raise e
 
+    def logout(self, token: str):
+        decoded = self._decode(token)
+        return self.create_token(decoded["id"], is_expired=True)
+
     def check_auth(self, token: str) -> bool:
-        decoded = jwt.decode(token, self.key, algorithms=["HS256"])
+        decoded = self._decode(token)
         try:
             user = user_repo.get(decoded["id"])
             if user:
@@ -43,7 +65,7 @@ class AuthProvider:
                 raise NotAuthorizedError
 
     def check_is_admin(self, token: str):
-        decoded = jwt.decode(token, self.key, algorithms=["HS256"])
+        decoded = self._decode(token)
         user = user_repo.get(decoded["id"])
         if user["user_type"] == UserType.ADMIN.value:
             return True
