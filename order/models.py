@@ -55,7 +55,7 @@ class OrderPayment(BaseModel):
         db_table = "order_payment"
 
 
-class OrderDilivery(BaseModel):
+class OrderDeilivery(BaseModel):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
