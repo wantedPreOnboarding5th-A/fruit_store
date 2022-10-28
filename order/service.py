@@ -1,8 +1,5 @@
 import enum
-import json
-from re import S
 import string
-from order import serializers
 from order.repository import (
     OrderDeliveryRepo,
     OrderRepo,
@@ -26,8 +23,9 @@ from order.exceptions import (
 )
 from product.repository import CartRepo
 from provider.payment_provider import CardPayProvider, NaverPayProvider
-import user
 from utils.dict_helper import exclude_by_keys
+from provider.auth_provider import auth_provider
+from exceptions import NoPermssionError
 
 payment_repo = PaymentRepo()
 transaction_repo = TransactionRepo()
@@ -64,7 +62,9 @@ class PaymentService:
         }
         payment.pop("order")
 
-        transaction = exclude_by_keys(set(["id", "created_at", "updated_at"]), transaction)
+        transaction = exclude_by_keys(
+            set(["id", "created_at", "updated_at"]), transaction
+        )
         serializer = PayResSchema(data={**data, **payment, **transaction})
         serializer.is_valid(raise_exception=True)
         return serializer.data
@@ -88,6 +88,20 @@ class PaymentService:
         is_already_paid = self._validate_payemnt_is_paid(order_id)
         if is_already_paid:
             raise AlreadyPaidError()
+
+    def get(self, payment_id: int, user_id: int, auth_token: str):
+        is_admin = auth_provider.check_is_admin(auth_token, no_execption=True)
+        payment = payment_repo.get_payment_with_transaction(payment_id)
+        payment_user_id = payment.pop("user_id")
+
+        # 유저는 자신의 결제만 조회 가능
+        if is_admin or payment_user_id == user_id:
+            return payment
+        else:
+            raise NoPermssionError
+
+    def find(self, user_id: int):
+        return payment_repo.find_payment_with_transaction_by_user_id(user_id)
 
     def pay(
         self,
@@ -133,7 +147,9 @@ class PaymentService:
             },
         )
         if is_success:
-            return self._parse_payment_with_transaction(transaction=transaction, payment=payment)
+            return self._parse_payment_with_transaction(
+                transaction=transaction, payment=payment
+            )
         else:
             # 결제 요청이 실패한 경우 request가 실패한 것으로 간주, db 반영과는 별도로 에러 response
             raise PaymentRequestFailedError()
