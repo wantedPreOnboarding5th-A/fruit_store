@@ -1,4 +1,3 @@
-from rest_framework.exceptions import ValidationError
 from order.models import OrderPayment, OrderTransaction, Order, ProductOut
 from order.serializers import (
     PaymentSerializer,
@@ -9,10 +8,11 @@ from order.serializers import (
 from exceptions import NotFoundError
 from pypika import MySQLQuery, Table
 from django.db import connection
-from utils.pypika_helper import dict_fetchone
+from utils.pypika_helper import dict_fetchone, dict_fetchall
 
 payment_table = Table("order_payment")
 transaction_table = Table("order_transacton")
+order_table = Table("order")
 
 
 class PaymentRepo:
@@ -32,6 +32,53 @@ class PaymentRepo:
             defaults=data,
         )
         return self.serilaizer(obj).data
+
+    def get_payment_with_transaction(self, payment_id: int) -> dict:
+        query = (
+            MySQLQuery.from_(payment_table)
+            .select(
+                payment_table.star,
+                transaction_table.id.as_("transaction_id"),
+                transaction_table.status,
+                transaction_table.amount,
+                order_table.user_id,
+            )
+            .where(payment_table.id == payment_id)
+            .left_join(transaction_table)
+            .on(payment_table.id == transaction_table.payment_id)
+            .left_join(order_table)
+            .on(payment_table.order_id == order_table.id)
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(query.get_sql())
+            payment = dict_fetchone(cursor)
+            if payment == None:
+                raise NotFoundError()
+            else:
+                return payment
+
+    def find_payment_with_transaction_by_user_id(self, user_id: int):
+        query = (
+            MySQLQuery.from_(payment_table)
+            .select(
+                payment_table.star,
+                transaction_table.id.as_("transaction_id"),
+                transaction_table.status,
+                transaction_table.amount,
+            )
+            .left_join(transaction_table)
+            .on(payment_table.id == transaction_table.payment_id)
+            .left_join(order_table)
+            .on(order_table.id == payment_table.order_id)
+            .where(order_table.user_id == user_id)
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(query.get_sql())
+            payment = dict_fetchall(cursor)
+            if payment == None:
+                raise NotFoundError()
+            else:
+                return payment
 
 
 class TransactionRepo:
@@ -114,32 +161,11 @@ class OrderRepo:
         """
         try:
             entity = self.model.objects.get(id=order_id)
-            # TODO 유효성 체크 id 동일한지
             serializer = self.serializer(entity, data=params, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
             raise NotFoundError()
-
-        """
-        Deprecated : Order 삭제 대신 상태 컬럼 업데이트로 변경
-        """
-
-    def delete(
-        self,
-        order_id: int,
-    ):
-        """하위 엔티티에 전부 on_delete=models.CASCADE 가 걸려있으므로
-        다른 모델에는 delete 를 작성하지 않았음"""
-        try:
-            entity = self.model.objects.get(id=order_id)
-            entity.delete()
-            return True
-        except self.model.DoesNotExist:
-            raise NotFoundError()
-
-    def find_order():
-        pass
 
 
 """

@@ -1,8 +1,5 @@
 import enum
-import json
-from re import S
 import string
-from order import serializers
 from order.repository import (
     OrderDeliveryRepo,
     OrderRepo,
@@ -13,7 +10,6 @@ from order.repository import (
 from exceptions import NotFoundError
 from order.serializers import (
     OrderCreateReqSchema,
-    OrderGetReqSchema,
     OrderResSchema,
     PayReqSchema,
     PayResSchema,
@@ -24,10 +20,11 @@ from order.exceptions import (
     PaymentRequestFailedError,
     CanNotPayNonExistOrderError,
 )
-from product.repository import CartPepo
+from product.repository import CartRepo
 from provider.payment_provider import CardPayProvider, NaverPayProvider
-import user
 from utils.dict_helper import exclude_by_keys
+from provider.auth_provider import auth_provider
+from exceptions import NoPermssionError
 
 payment_repo = PaymentRepo()
 transaction_repo = TransactionRepo()
@@ -89,6 +86,20 @@ class PaymentService:
         if is_already_paid:
             raise AlreadyPaidError()
 
+    def get(self, payment_id: int, user_id: int, auth_token: str):
+        is_admin = auth_provider.check_is_admin(auth_token, no_execption=True)
+        payment = payment_repo.get_payment_with_transaction(payment_id)
+        payment_user_id = payment.pop("user_id")
+
+        # 유저는 자신의 결제만 조회 가능
+        if is_admin or payment_user_id == user_id:
+            return payment
+        else:
+            raise NoPermssionError
+
+    def find(self, user_id: int):
+        return payment_repo.find_payment_with_transaction_by_user_id(user_id)
+
     def pay(
         self,
         order_id: int,
@@ -144,7 +155,7 @@ class OrderManagementService:
         self.order_repo = OrderRepo()
         self.order_delivery_repo = OrderDeliveryRepo()
         self.product_out_repo = ProductOutRepo()
-        self.cart_repo = CartPepo()  # TODO 오타 수정
+        self.cart_repo = CartRepo()  # TODO 오타 수정
 
     # Validation 체크 : 상품 출고
     """
@@ -152,7 +163,7 @@ class OrderManagementService:
     product repo에서 상품을 끌어오기
 
     """
-
+    # upsert 으로
     def _create_order(
         self,
         user_id: int,
@@ -243,11 +254,6 @@ class OrderManagementService:
         order_id,
         user_id,
     ) -> dict:
-        data = {"order_id": order_id, "user_id": user_id}
-        data = OrderGetReqSchema(data=data)
-        data.is_valid(raise_exception=True)
-        # 만약 로그인한 유저가 아닐경우 검증할 로직이 필요한지
-        #
         get_order = self.order_repo.get_by_order_id(order_id=order_id)
         get_delivery = self.order_delivery_repo.get(order_id=order_id)
 
@@ -274,8 +280,10 @@ class OrderManagementService:
 
         return res
 
-    # def _get_order_list(user_id: int) -> list:
-    #     pass
+    def _get_order_list(user_id: int) -> list:
+        """user_id 를 인수로 받아서 해당 유저의 주문목록을 리턴"""
+        """리스트 구현?"""
+        pass
 
     def _deilvery_status_update(order_id: int, new_status: enum) -> dict:
         order = order_repo.get_by_order_id(order_id=order_id)

@@ -7,7 +7,7 @@ def must_be_user():
     def decorator(api_func):
         @wraps(api_func)
         def _wrapped_view(request, *args, **kwargs):
-            auth_token = request.META.get("HTTP_AUTHORIZATION", None)
+            auth_token = auth_provider.get_token_from_request(request)
             if auth_token == None:
                 raise NotAuthorizedError
             user = auth_provider.check_auth(auth_token)
@@ -23,7 +23,7 @@ def must_be_admin():
     def decorator(api_func):
         @wraps(api_func)
         def _wrapped_view(request, *args, **kwargs):
-            auth_token = request.META.get("HTTP_AUTHORIZATION", None)
+            auth_token = auth_provider.get_token_from_request(request)
             if auth_token == None:
                 raise NotAuthorizedError
             user = auth_provider.check_is_admin(auth_token)
