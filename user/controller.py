@@ -28,7 +28,7 @@ def signup(request):
     params = request.data
     params = UserSignUpSchema(data=params)
     params.is_valid(raise_exception=True)
-    created_user = user_service.create(**params.data)
+    created_user = user_service.create(params.data)
     return JsonResponse(created_user, status=status.HTTP_201_CREATED)
 
 

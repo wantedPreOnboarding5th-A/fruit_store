@@ -167,7 +167,6 @@ class OrderManagementService:
     def _create_order(
         self,
         user_id: int,
-        delivery_fee: int,
         trace_no: string,
         customer_name: string,
         customer_phone: string,
@@ -186,7 +185,7 @@ class OrderManagementService:
         # todo 장바구니 리스트 끌어오기 params : user_id
         # TODO delivery 수정
         data = {
-            "delivery_fee": delivery_fee,
+            "user_id": user_id,
             "trace_no": trace_no,
             "customer_name": customer_name,
             "customer_phone": customer_phone,
@@ -203,9 +202,11 @@ class OrderManagementService:
         params.is_valid(raise_exception=True)
 
         # cart repo에 리스트 요청
-        cart_list = self.cart_repo.get(user_id=user_id)
+        # cart_list = self.cart_repo.find(user=user_id)
 
         # cart 가격 합산
+        total_price = 0
+        total_delivery_fee = 0
         for cart in cart_list:
             # price , options[amount]
             price = cart["price"] * cart["options"]["amount"]
@@ -252,7 +253,6 @@ class OrderManagementService:
     def _get_order_detail(
         self,
         order_id,
-        user_id,
     ) -> dict:
         get_order = self.order_repo.get_by_order_id(order_id=order_id)
         get_delivery = self.order_delivery_repo.get(order_id=order_id)
