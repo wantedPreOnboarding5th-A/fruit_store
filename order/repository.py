@@ -1,5 +1,6 @@
-from order.models import OrderPayment, OrderTransaction, Order, ProductOut
+from order.models import OrderDeilivery, OrderPayment, OrderTransaction, Order, ProductOut
 from order.serializers import (
+    OrderDeliverySerializer,
     PaymentSerializer,
     TransactionSerializer,
     OrderSerializer,
@@ -151,9 +152,10 @@ class OrderRepo:
 
     def create(self, params: dict) -> dict:
         """create order : 인자로 딕셔너리를 받습니다."""
-        Serializer = self.serializer(data=params)
-        Serializer.is_valid(raise_exception=True)  # 유효성 체크
-        Serializer.save()
+        serializer = self.serializer(data=params)
+        serializer.is_valid(raise_exception=True)  # 유효성 체크
+        serializer.save()
+        return serializer.data
 
     def update(self, order_id: int, params: dict) -> dict:
         """update order : 인자로 orderid, 딕셔너리를 받습니다.
@@ -222,8 +224,8 @@ class ProductOutRepo:
 
 class OrderDeliveryRepo:
     def __init__(self) -> None:
-        self.model = Order
-        self.serializer = OrderSerializer
+        self.model = OrderDeilivery
+        self.serializer = OrderDeliverySerializer
 
         """
         Read OrderDelivery 
@@ -231,7 +233,7 @@ class OrderDeliveryRepo:
 
     def get(self, order_id: int) -> dict:
         try:
-            return self.serializer(self.model.objects.get(id=order_id)).data
+            return self.serializer(self.model.objects.get(order=order_id)).data
         except self.model.DoesNotExist:
             raise NotFoundError()
 
@@ -240,9 +242,9 @@ class OrderDeliveryRepo:
         """
 
     def create(self, params: dict) -> dict:
-        Serializer = self.serializer(data=params)
-        Serializer.is_valid(raise_exception=True)  # 유효성 체크
-        Serializer.save()
+        serializer = self.serializer(data=params)
+        serializer.is_valid(raise_exception=True)  # 유효성 체크
+        serializer.save()
 
         """
         update Order

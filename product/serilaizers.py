@@ -1,3 +1,4 @@
+from django.forms import IntegerField
 from rest_framework import serializers
 
 from .models import Product, ProductDescription, ProductImg, Cart, ProductOption
@@ -30,6 +31,12 @@ class ProductOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOption
         fields = "__all__"
+
+
+# TODO
+class OrderUpdateSchema(serializers.Serializer):
+    order_id = serializers.IntegerField()
+    status = serializers.CharField()
 
 
 class ProductRegisterSchema(serializers.Serializer):

@@ -26,7 +26,6 @@ class OrderCreateReqSchema(serializers.Serializer):
     """
 
     # TODO 오타수정 delivery -> delivery
-    dilivery_fee = serializers.IntegerField()
 
     # 이하는 배송정보에 들어갈 내용
     trace_no = serializers.CharField()
@@ -50,11 +49,9 @@ class OrderResSchema(serializers.Serializer):
     price = serializers.IntegerField()
     # TODO 오타수정 delivery -> delivery
     dilivery_fee = serializers.IntegerField()
-    options = serializers.JSONField()
     status = serializers.CharField()
 
     # 이하는 배송정보에 들어갈 내용
-    trace_no = serializers.CharField()
     customer_name = serializers.CharField()
     customer_phone = serializers.CharField()
     delivery_name = serializers.CharField()

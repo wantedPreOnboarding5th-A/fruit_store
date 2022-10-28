@@ -1,3 +1,4 @@
+import enum
 import json
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, parser_classes
@@ -8,6 +9,7 @@ from decorators.execption_handler import execption_hanlder
 from decorators.auth_handler import must_be_user
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from product.serilaizers import OrderUpdateSchema
 from provider.auth_provider import auth_provider
 
 from rest_framework.views import APIView
@@ -54,30 +56,36 @@ def get_payment(request, payment_id: str):
     return JsonResponse(payment_service.get(int(payment_id), request.user["id"], auth_token))
 
 
-@must_be_user()
 @api_view(["POST"])
-@execption_hanlder()
+# @execption_hanlder()
+@must_be_user()
 @parser_classes([JSONParser])
 def order_create(request):
+
     params = OrderCreateReqSchema(data=request.data)
     params.is_valid(raise_exception=True)
-    return JsonResponse(order_management_service._create_order(params))
+    user_id = request.user["id"]
+
+    created_order = order_management_service._create_order(user_id=user_id, **params.data)
+
+    return JsonResponse(created_order)
 
 
 @api_view(["GET"])
-@execption_hanlder()
+# @execption_hanlder()
 @parser_classes([JSONParser])
-def order_details(request):
-    params = request.get("status")
-    return JsonResponse(order_management_service._get_order(params))
+def order_details(request, order_id: int):
+    return JsonResponse(order_management_service._get_order_detail(order_id))
 
 
-@must_be_admin()
 @api_view(["PUT"])
-@execption_hanlder()
+# @execption_hanlder()
 @parser_classes([JSONParser])
 def order_status_update(request):
-    # enum 체크 구현하기
-    order_id = request.order_id
-    params = request.status
-    return JsonResponse(order_management_service._deilvery_status_update(order_id, params))
+    params = OrderUpdateSchema(data=request.data)
+    params.is_valid(raise_exception=True)
+    order_id = params.data["order_id"]
+    status = params.data["status"]
+
+    a = params.data
+    return JsonResponse(order_management_service._deilvery_status_update(order_id, status))
