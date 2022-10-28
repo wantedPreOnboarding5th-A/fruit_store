@@ -12,3 +12,9 @@ class NotExistQueryParmeter(CustomBaseExecption):
     def __init__(self):
         self.msg = "The Product ID does not exist."
         self.status = status.HTTP_400_BAD_REQUEST
+
+
+class InvaildKey(CustomBaseExecption):
+    def __init__(self):
+        self.msg = "Check your Key of Parameter ."
+        self.status = status.HTTP_400_BAD_REQUEST
