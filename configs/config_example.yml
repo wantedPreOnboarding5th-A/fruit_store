@@ -8,3 +8,16 @@ databases:
 
 secrets:
   django: "django-something-something"
+
+
+naver_pay:
+  client_id: "some id"
+  mode: "production or develop"
+  merchantUserKey: 1234
+  merchantPayKey: 1234
+
+card_pay:
+  member_id: 1234
+
+token:
+  scret: "JWT SECRET HERE"

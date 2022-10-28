@@ -1,5 +1,4 @@
 import enum
-from re import S
 import string
 from order.repository import (
     OrderDeliveryRepo,
@@ -21,9 +20,11 @@ from order.exceptions import (
     PaymentRequestFailedError,
     CanNotPayNonExistOrderError,
 )
-from product.repository import CartPepo
+from product.repository import CartRepo
 from provider.payment_provider import CardPayProvider, NaverPayProvider
 from utils.dict_helper import exclude_by_keys
+from provider.auth_provider import auth_provider
+from exceptions import NoPermssionError
 
 payment_repo = PaymentRepo()
 transaction_repo = TransactionRepo()
@@ -85,6 +86,20 @@ class PaymentService:
         if is_already_paid:
             raise AlreadyPaidError()
 
+    def get(self, payment_id: int, user_id: int, auth_token: str):
+        is_admin = auth_provider.check_is_admin(auth_token, no_execption=True)
+        payment = payment_repo.get_payment_with_transaction(payment_id)
+        payment_user_id = payment.pop("user_id")
+
+        # 유저는 자신의 결제만 조회 가능
+        if is_admin or payment_user_id == user_id:
+            return payment
+        else:
+            raise NoPermssionError
+
+    def find(self, user_id: int):
+        return payment_repo.find_payment_with_transaction_by_user_id(user_id)
+
     def pay(
         self,
         order_id: int,
@@ -140,7 +155,7 @@ class OrderManagementService:
         self.order_repo = OrderRepo()
         self.order_delivery_repo = OrderDeliveryRepo()
         self.product_out_repo = ProductOutRepo()
-        self.cart_repo = CartPepo()  # TODO 오타 수정
+        self.cart_repo = CartRepo()  # TODO 오타 수정
 
     # Validation 체크 : 상품 출고
     """

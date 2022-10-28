@@ -86,3 +86,16 @@ class Cart(BaseModel):
 
     class Meta:
         db_table = "cart"
+
+
+class ProductOption(BaseModel):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        db_column="product_id",
+    )
+    options = models.CharField(null=False, max_length=50)
+    price = models.PositiveIntegerField(null=False, default=0)
+
+    class Meta:
+        db_table = "product_option"
