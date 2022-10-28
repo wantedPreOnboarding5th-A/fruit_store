@@ -8,11 +8,11 @@ from decorators.execption_handler import execption_hanlder
 from decorators.auth_handler import must_be_user
 
 from .service import ProductService, CartService
-from .serilaizers import ProductRegisterSchema, ProductListSchema
+from .serilaizers import ProductRegisterSchema
 from exceptions import NotFoundError
 from user.models import User
 from .exceptions import NotExistQueryParmeter, InvaildKey
-
+from decorators.auth_handler import must_be_admin
 
 product_service = ProductService()
 cart_service = CartService()
@@ -22,16 +22,19 @@ class ProcuctAPI(APIView):
     def get(self, request, product_id):
         return JsonResponse(product_service.get_detail(product_id=product_id))
 
+    @must_be_admin()
     def post(self, request):
         params = ProductRegisterSchema(data=request.data)
         params.is_valid(raise_exception=True)
         return JsonResponse(product_service.create(**params.data))
 
+    @must_be_admin()
     def put(self, request, product_id):
         params = ProductRegisterSchema(data=request.data)
         params.is_valid(raise_exception=True)
         return JsonResponse(product_service.update(product_id=product_id, **params.data))
 
+    @must_be_admin()
     def delete(self, request, product_id):
         return JsonResponse(product_service.delete(product_id=product_id))
 
