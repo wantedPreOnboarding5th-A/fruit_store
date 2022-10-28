@@ -112,53 +112,61 @@ class CartRepo:
         self.serilaizer = CartSerializer
         self.model = Cart
         self.orderserilaier = OrderSerializer
-    
-    def find(self, user: object):
+
+    def find_by_user_id(self, user_id):
         try:
-            return self.serilaizer(self.model.objects.filter(user=user), many = True).data
-        
+            return self.serilaizer(self.model.objects.filter(user_id=user_id), many=True).data
+
         except self.model.DoesNotExist:
             raise NotFoundError
 
-    
-    def create(self, user: object, product_ids: list) -> None:        
+    def find(self, user: object):
+        try:
+            return self.serilaizer(self.model.objects.filter(user=user), many=True).data
+
+        except self.model.DoesNotExist:
+            raise NotFoundError
+
+    def create(self, user: object, product_ids: list) -> None:
         try:
 
-            # 유저의 product_id에 해당하는 장바구니 객체  
-            carts = [Cart.objects.get(product = Product.objects.get(id = i), user = user) for i in product_ids]
-            
+            # 유저의 product_id에 해당하는 장바구니 객체
+            carts = [
+                Cart.objects.get(product=Product.objects.get(id=i), user=user) for i in product_ids
+            ]
+
             for cart in carts:
                 data = {
-                    "user" : cart.user.id,
-                    "price":cart.price,
-                    "dilivery_fee":0 if cart.price >= 50000 else 5000, # 50000원 이상 결제시 배송비 무료
-                    "status": OrderStatusType.PAID_CONFIRMD.value # order로 변경시 상태 코드 변경
+                    "user": cart.user.id,
+                    "price": cart.price,
+                    "dilivery_fee": 0 if cart.price >= 50000 else 5000,  # 50000원 이상 결제시 배송비 무료
+                    "status": OrderStatusType.PAID_CONFIRMD.value,  # order로 변경시 상태 코드 변경
                 }
                 serialize = self.orderserilaier(data=data)
                 serialize.is_valid(raise_exception=True)
                 serialize.save()
-                cart.delete() # order된 상품을 장바구니에서 제거
+                cart.delete()  # order된 상품을 장바구니에서 제거
 
         except Cart.DoesNotExist:
-            raise NotFoundError() 
+            raise NotFoundError()
 
-        
-    def update(self, user: object, product_id: int, data :dict) -> None:
+    def update(self, user: object, product_id: int, data: dict) -> None:
         try:
-            target = self.model.objects.get(product = Product.objects.get(id = product_id), user = user)
-            serializer = self.serilaizer(target, data = data, partial = True)
+            target = self.model.objects.get(product=Product.objects.get(id=product_id), user=user)
+            serializer = self.serilaizer(target, data=data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-        
+
         except self.model.DoesNotExist:
             raise NotFoundError
-        
 
     def delete(self, user: object, product_ids: list) -> None:
         try:
-            for product_id in product_ids:    
-                target = self.model.objects.get(product = Product.objects.get(id = product_id), user = user)
+            for product_id in product_ids:
+                target = self.model.objects.get(
+                    product=Product.objects.get(id=product_id), user=user
+                )
                 target.delete()
-        
+
         except self.model.DoesNotExist:
             raise NotFoundError

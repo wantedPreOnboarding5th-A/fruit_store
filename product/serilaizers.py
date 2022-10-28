@@ -1,3 +1,4 @@
+from django.forms import IntegerField
 from rest_framework import serializers
 
 from .models import Product, ProductDescription, ProductImg, Cart, ProductOption
@@ -32,15 +33,19 @@ class ProductOptionSerializer(serializers.ModelSerializer):
         field = "__all__"
 
 
+# TODO
+class OrderUpdateSchema(serializers.Serializer):
+    order_id = serializers.IntegerField()
+    status = serializers.CharField()
+
+
 class ProductRegisterSchema(serializers.Serializer):
     """
     상품 등록 및 상세 조회 기능 요청에 필요한 파라미터 정의
     """
 
     name = serializers.CharField(max_length=80)
-    desc_context = serializers.CharField(
-        max_length=1024
-    )  # serializers에 TextField가 존재하지 않음
+    desc_context = serializers.CharField(max_length=1024)  # serializers에 TextField가 존재하지 않음
     package = serializers.CharField(max_length=50)
     producer = serializers.CharField(max_length=100)
     product_date = serializers.DateField()

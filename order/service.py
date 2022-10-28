@@ -150,19 +150,22 @@ class PaymentService:
             raise PaymentRequestFailedError()
 
 
+order_repo = OrderRepo()
+order_delivery_repo = OrderDeliveryRepo()
+product_out_repo = ProductOutRepo()
+cart_repo = CartRepo()
+
+
 class OrderManagementService:
     def __init__(self) -> None:
-        self.order_repo = OrderRepo()
-        self.order_delivery_repo = OrderDeliveryRepo()
-        self.product_out_repo = ProductOutRepo()
-        self.cart_repo = CartRepo()  # TODO 오타 수정
+        # TODO 오타 수정
 
-    # Validation 체크 : 상품 출고
-    """
-    단일 품목으로 주문받는경우 수량은 productOut options에서 끌어오기
-    product repo에서 상품을 끌어오기
+        # Validation 체크 : 상품 출고
+        """
+        단일 품목으로 주문받는경우 수량은 productOut options에서 끌어오기
+        product repo에서 상품을 끌어오기
+        """
 
-    """
     # upsert 으로
     def _create_order(
         self,
@@ -185,7 +188,6 @@ class OrderManagementService:
         # todo 장바구니 리스트 끌어오기 params : user_id
         # TODO delivery 수정
         data = {
-            "user_id": user_id,
             "trace_no": trace_no,
             "customer_name": customer_name,
             "customer_phone": customer_phone,
@@ -201,12 +203,10 @@ class OrderManagementService:
         params = OrderCreateReqSchema(data=data)
         params.is_valid(raise_exception=True)
 
-        # cart repo에 리스트 요청
-        # cart_list = self.cart_repo.find(user=user_id)
-
-        # cart 가격 합산
         total_price = 0
         total_delivery_fee = 0
+        cart_list = cart_repo.find_by_user_id(user_id)
+
         for cart in cart_list:
             # price , options[amount]
             price = cart["price"] * cart["options"]["amount"]
@@ -218,15 +218,17 @@ class OrderManagementService:
         # TODO Dilivery fee 수정 바랍니다.
 
         # 필드별로 나누어서 저장
+
         order = {
-            "user_id": user_id,
+            "user": user_id,
             "price": total_price,
             "dilivery_fee": total_delivery_fee,
             "status": "C",  # status 조금
         }
-        self.order_repo.create(order)
+        order_id = order_repo.create(order)["id"]
 
         order_delivery = {
+            "order": order_id,
             "customer_name": customer_name,
             "customer_phone": customer_phone,
             "customer_email": customer_email,
@@ -237,34 +239,22 @@ class OrderManagementService:
             "address": address,
             "address_detail": address_detail,
         }
-        self.order_delivery_repo.create(order_delivery)
+        order_delivery_repo.create(order_delivery)
         # status
 
         # response
         return order
 
-    def _get_order_list(
-        self,
-        order_id,
-        user_id,
-    ):
-        pass
-
-    def _get_order_detail(
-        self,
-        order_id,
-    ) -> dict:
-        get_order = self.order_repo.get_by_order_id(order_id=order_id)
-        get_delivery = self.order_delivery_repo.get(order_id=order_id)
+    def _get_order_detail(self, order_id) -> dict:
+        get_order = order_repo.get_by_order_id(order_id=order_id)
+        get_delivery = order_delivery_repo.get(order_id=order_id)
 
         get_data = {
-            "order_id": get_order["order_id"],
+            "order_id": get_order["id"],
             "price": get_order["price"],
             # TODO 오타수정 delivery -> delivery
-            "delivery_fee": get_order["delivery_fee"],
-            "options": get_order["options"],
+            "dilivery_fee": get_order["dilivery_fee"],
             "status": get_order["status"],
-            "trace_no": get_delivery["trace_no"],
             # 이하는 배송정보에 들어갈 내용
             "customer_name": get_delivery["customer_name"],
             "customer_phone": get_delivery["customer_phone"],
@@ -278,20 +268,21 @@ class OrderManagementService:
         res = OrderResSchema(data=get_data)
         res.is_valid(raise_exception=True)
 
-        return res
+        return res.data
 
     def _get_order_list(user_id: int) -> list:
         """user_id 를 인수로 받아서 해당 유저의 주문목록을 리턴"""
         """리스트 구현?"""
         pass
 
-    def _deilvery_status_update(order_id: int, new_status: enum) -> dict:
+    def _deilvery_status_update(self, order_id: int, new_status: enum) -> dict:
+
         order = order_repo.get_by_order_id(order_id=order_id)
+
         order_status_now = order["status"]
-        order_status_new = new_status  # enum validation 작성
+        # enum validation 작성
 
         order["status"] = new_status
-        order_repo.update(order_id=order["order_id"])
+        order_repo.update(order_id=order_id, params=order)
 
-        res = {"order_id": order_id}
-        return res
+        return order
