@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "order.apps.OrderConfig",
     "product.apps.ProductConfig",
     "user.apps.UserConfig",
-
 ]
 
 MIDDLEWARE = [
@@ -89,7 +88,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -130,3 +128,20 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+NAVER_PAY_CLIENT_ID = config.naver_pay["client_id"]
+NAVER_PAY_MODE = config.naver_pay["mode"]
+NAVER_PAY_MERCHANT_USER_KEY = config.naver_pay["merchantUserKey"]
+NAVER_PAY_MERCHANT_PAY_KEY = config.naver_pay["merchantPayKey"]
+
+CARD_PAY_MEMBER_ID = config.card_pay["member_id"]
+
+# JWT SECRET
+JWT_KEY = config.token["scret"]
+JWT_EXPIRE_TIME = config.token["expire_sec"]
+
+# DEFAULT_FILE_STORAGE = config.aws_s3["default_file_storage"]
+# AWS_S3_ACCESS_KEY_ID = config.aws_s3["aws_access_key_id"]
+# AWS_S3_SECRET_ACCESS_KEY = config.aws_s3["aws_secret_access_key"]
+# AWS_STORAGE_BUCKET_NAME = config.aws_s3["aws_storage_bucket_name"]
+# AWS_QUERYSTRING_AUTH = config.aws_s3["aws_querystring_auth"]

@@ -11,7 +11,7 @@ class Order(BaseModel):
         db_column="user_id",
     )
     price = models.IntegerField(null=False)
-    dilivery_fee = models.IntegerField(null=False)
+    dilivery_fee = models.IntegerField(null=False)  # TODO 오타수정 delivery -> delivery
     status = models.CharField(max_length=1)
 
     class Meta:
@@ -30,7 +30,7 @@ class ProductOut(BaseModel):
         db_column="order_id",
     )
     price = models.IntegerField(null=False)
-    delivery_fee = models.IntegerField(null=False)
+    delivery_fee = models.IntegerField(null=False)  # TODO 오타수정 delivery -> delivery
     options = models.JSONField(null=False)
     status = models.CharField(max_length=1, null=False)
     trace_no = models.CharField(max_length=100)
@@ -46,16 +46,16 @@ class OrderPayment(BaseModel):
         db_column="order_id",
     )
     payment_type = models.CharField(max_length=1, null=False)
-    cash_receipts = models.CharField(max_length=1, null=False)
-    cash_receipts_number = models.IntegerField(null=False)
-    deposit_number = models.IntegerField(null=False)
-    depositor = models.CharField(max_length=20, null=False)
+    cash_receipts = models.CharField(max_length=1)
+    cash_receipts_number = models.IntegerField()
+    deposit_number = models.IntegerField()
+    depositor = models.CharField(max_length=20)
 
     class Meta:
         db_table = "order_payment"
 
 
-class OrderDilivery(BaseModel):
+class OrderDeilivery(BaseModel):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
@@ -72,10 +72,10 @@ class OrderDilivery(BaseModel):
     address_detail = models.CharField(max_length=100)
 
     class Meta:
-        db_table = "order_dilivery"
+        db_table = "order_dilivery"  # -> delivery
 
 
-class Order_transaction(BaseModel):
+class OrderTransaction(BaseModel):
     payment = models.ForeignKey(
         OrderPayment,
         on_delete=models.CASCADE,
