@@ -33,7 +33,6 @@ class ProductOptionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# TODO
 class OrderUpdateSchema(serializers.Serializer):
     order_id = serializers.IntegerField()
     status = serializers.CharField()

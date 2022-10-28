@@ -57,7 +57,7 @@ def get_payment(request, payment_id: str):
 
 
 @api_view(["POST"])
-# @execption_hanlder()
+@execption_hanlder()
 @must_be_user()
 @parser_classes([JSONParser])
 def order_create(request):
@@ -72,14 +72,16 @@ def order_create(request):
 
 
 @api_view(["GET"])
-# @execption_hanlder()
+@execption_hanlder()
+@must_be_user()
 @parser_classes([JSONParser])
 def order_details(request, order_id: int):
     return JsonResponse(order_management_service._get_order_detail(order_id))
 
 
 @api_view(["PUT"])
-# @execption_hanlder()
+@execption_hanlder()
+@must_be_admin()
 @parser_classes([JSONParser])
 def order_status_update(request):
     params = OrderUpdateSchema(data=request.data)

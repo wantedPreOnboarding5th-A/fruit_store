@@ -43,7 +43,7 @@ def test_get_by_product_id_product_repo():
 
 @pytest.mark.django_db()
 def test_upsert_product_repo():
-    sut = product_repo.upsert()  # TODO data 추가 필요
+    sut = product_repo.upsert()
     isinstance(sut, dict)
 
 

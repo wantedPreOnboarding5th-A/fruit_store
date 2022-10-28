@@ -25,8 +25,6 @@ class OrderCreateReqSchema(serializers.Serializer):
     Service 기능 요청을 위한 주문 요청 scheme
     """
 
-    # TODO 오타수정 delivery -> delivery
-
     # 이하는 배송정보에 들어갈 내용
     trace_no = serializers.CharField()
     customer_name = serializers.CharField()
@@ -47,8 +45,8 @@ class OrderResSchema(serializers.Serializer):
 
     order_id = serializers.IntegerField()
     price = serializers.IntegerField()
-    # TODO 오타수정 delivery -> delivery
-    dilivery_fee = serializers.IntegerField()
+
+    delivery_fee = serializers.IntegerField()
     status = serializers.CharField()
 
     # 이하는 배송정보에 들어갈 내용
