@@ -7,11 +7,8 @@ from order.serializers import OrderDeliverySerializer, OrderSerializer
 
 
 class TestSerializer:
-    def setup(self):
-        self.order_serializer = OrderSerializer
-        self.order_delivery_serializer = OrderDeliverySerializer
-
     def test_order_serializer(self):
+        self.order_serializer = OrderSerializer
         order_serializer = self.order_serializer(
             data={"user_id": 1, "price": 123, "dilivery_fee": 123, "status": "D"}
         )
@@ -31,6 +28,7 @@ class TestSerializer:
         assert order_serializer.errors == {}
 
     def test_order_delivery_serializer(self):
+        self.order_delivery_serializer = OrderDeliverySerializer
         order_delivery_serializer = OrderDeliverySerializer(
             data={
                 "order_id": 1,
