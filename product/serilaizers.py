@@ -38,9 +38,9 @@ class ProductRegisterSchema(serializers.Serializer):
     """
 
     name = serializers.CharField(max_length=80)
-    desc_context = serializers.CharField(
-        max_length=1024
-    )  # serializers에 TextField가 존재하지 않음
+    sale_status = serializers.CharField(max_length=1)
+    is_sale = serializers.IntegerField()
+    desc_context = serializers.CharField(max_length=1024)
     package = serializers.CharField(max_length=50)
     producer = serializers.CharField(max_length=100)
     product_date = serializers.DateField()
