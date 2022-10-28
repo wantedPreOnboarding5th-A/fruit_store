@@ -1,4 +1,3 @@
-from rest_framework.exceptions import ValidationError
 from order.models import OrderPayment, OrderTransaction, Order, ProductOut
 from order.serializers import (
     PaymentSerializer,
@@ -9,10 +8,11 @@ from order.serializers import (
 from exceptions import NotFoundError
 from pypika import MySQLQuery, Table
 from django.db import connection
-from utils.pypika_helper import dict_fetchone
+from utils.pypika_helper import dict_fetchone, dict_fetchall
 
 payment_table = Table("order_payment")
 transaction_table = Table("order_transacton")
+order_table = Table("order")
 
 
 class PaymentRepo:
@@ -32,6 +32,53 @@ class PaymentRepo:
             defaults=data,
         )
         return self.serilaizer(obj).data
+
+    def get_payment_with_transaction(self, payment_id: int) -> dict:
+        query = (
+            MySQLQuery.from_(payment_table)
+            .select(
+                payment_table.star,
+                transaction_table.id.as_("transaction_id"),
+                transaction_table.status,
+                transaction_table.amount,
+                order_table.user_id,
+            )
+            .where(payment_table.id == payment_id)
+            .left_join(transaction_table)
+            .on(payment_table.id == transaction_table.payment_id)
+            .left_join(order_table)
+            .on(payment_table.order_id == order_table.id)
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(query.get_sql())
+            payment = dict_fetchone(cursor)
+            if payment == None:
+                raise NotFoundError()
+            else:
+                return payment
+
+    def find_payment_with_transaction_by_user_id(self, user_id: int):
+        query = (
+            MySQLQuery.from_(payment_table)
+            .select(
+                payment_table.star,
+                transaction_table.id.as_("transaction_id"),
+                transaction_table.status,
+                transaction_table.amount,
+            )
+            .left_join(transaction_table)
+            .on(payment_table.id == transaction_table.payment_id)
+            .left_join(order_table)
+            .on(order_table.id == payment_table.order_id)
+            .where(order_table.user_id == user_id)
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(query.get_sql())
+            payment = dict_fetchall(cursor)
+            if payment == None:
+                raise NotFoundError()
+            else:
+                return payment
 
 
 class TransactionRepo:
@@ -67,7 +114,7 @@ class TransactionRepo:
 
 
 # Must To-do List 처리
-
+# Must To-do 전역 Exception 클래스 파일 들어오면 Exception 처리
 
 """
 OrderRepository
@@ -83,21 +130,24 @@ class OrderRepo:
         user_id 를 인자로 받아 리스트를 반환
         """
 
-    def get_by_user_id(self, user_id: int) -> dict:
+    def find_order_by_user_id(self, user_id: int) -> dict:
+
+        self.serializer(self.model.objects.get(id=user_id)).data
         try:
-            return self.serializer(self.model.objects.get(id=user_id)).data
+            return
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
 
         """
         Read Order 
         """
 
     def get_by_order_id(self, order_id: int) -> dict:
+
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
 
     def create(self, params: dict) -> dict:
         """create order : 인자로 딕셔너리를 받습니다."""
@@ -116,7 +166,11 @@ class OrderRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
+
+        """
+        Deprecated : Order 삭제 대신 상태 컬럼 업데이트로 변경
+        """
 
     def delete(
         self,
@@ -129,7 +183,10 @@ class OrderRepo:
             entity.delete()
             return True
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
+
+    def find_order():
+        pass
 
 
 """
@@ -138,7 +195,7 @@ Product 출고 Repo
 
 
 class ProductOutRepo:
-    def ___init___(self) -> None:
+    def __init__(self) -> None:
         self.model = ProductOut
         self.serializer = ProductOutSerializer
 
@@ -150,7 +207,7 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
         """
         Read OrderProduct by Product_id
         """
@@ -159,7 +216,7 @@ class ProductOutRepo:
         try:
             return self.serializer(self.model.objects.get(id=product_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
 
         """
         create Order
@@ -181,11 +238,11 @@ class ProductOutRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
 
 
 class OrderDeliveryRepo:
-    def ___init___(self) -> None:
+    def __init__(self) -> None:
         self.model = Order
         self.serializer = OrderSerializer
 
@@ -197,7 +254,7 @@ class OrderDeliveryRepo:
         try:
             return self.serializer(self.model.objects.get(id=order_id)).data
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
 
         """
         create Order
@@ -219,19 +276,8 @@ class OrderDeliveryRepo:
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
-            raise NotFoundError
+            raise NotFoundError()
 
         """
         Delete Order
         """
-
-    def delete(
-        self,
-        order_id: int,
-    ):
-        try:
-            entity = self.model.objects.get(id=order_id)
-            entity.delete()
-            return True
-        except self.model.DoesNotExist:
-            raise NotFoundError

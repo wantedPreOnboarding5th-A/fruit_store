@@ -36,6 +36,9 @@ class AuthProvider:
         else:
             return decoded
 
+    def get_token_from_request(self, request):
+        return request.META.get("HTTP_AUTHORIZATION", None)
+
     def create_token(self, user_id: str, is_expired: bool = False):
         exp = 0 if is_expired else self._get_curr_sec() + self.expire_sec
         encoded_jwt = jwt.encode(
@@ -74,11 +77,13 @@ class AuthProvider:
             if isinstance(e, NotFoundError):
                 raise NotAuthorizedError
 
-    def check_is_admin(self, token: str):
+    def check_is_admin(self, token: str, no_execption: bool = False):
         decoded = self._decode(token)
         user = user_repo.get(decoded["id"])
         if user["user_type"] == UserType.ADMIN.value:
             return True
+        if no_execption:
+            return False
         else:
             raise NoPermssionError
 

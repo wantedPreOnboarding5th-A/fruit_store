@@ -1,14 +1,31 @@
+import enum
+import string
+from order.repository import (
+    OrderDeliveryRepo,
+    OrderRepo,
+    PaymentRepo,
+    ProductOutRepo,
+    TransactionRepo,
+)
 from exceptions import NotFoundError
-from order.repository import OrderRepo, PaymentRepo, TransactionRepo
-from order.serializers import PayReqSchema, PayResSchema
+from order.serializers import (
+    OrderCreateReqSchema,
+    OrderGetReqSchema,
+    OrderResSchema,
+    PayReqSchema,
+    PayResSchema,
+)
 from order.enums import TransactionStatusType, PaymentType
 from order.exceptions import (
     AlreadyPaidError,
     PaymentRequestFailedError,
     CanNotPayNonExistOrderError,
 )
+from product.repository import CartRepo
 from provider.payment_provider import CardPayProvider, NaverPayProvider
 from utils.dict_helper import exclude_by_keys
+from provider.auth_provider import auth_provider
+from exceptions import NoPermssionError
 
 payment_repo = PaymentRepo()
 transaction_repo = TransactionRepo()
@@ -44,6 +61,7 @@ class PaymentService:
             "transaction_id": transaction["id"],
         }
         payment.pop("order")
+
         transaction = exclude_by_keys(
             set(["id", "created_at", "updated_at"]), transaction
         )
@@ -70,6 +88,20 @@ class PaymentService:
         is_already_paid = self._validate_payemnt_is_paid(order_id)
         if is_already_paid:
             raise AlreadyPaidError()
+
+    def get(self, payment_id: int, user_id: int, auth_token: str):
+        is_admin = auth_provider.check_is_admin(auth_token, no_execption=True)
+        payment = payment_repo.get_payment_with_transaction(payment_id)
+        payment_user_id = payment.pop("user_id")
+
+        # 유저는 자신의 결제만 조회 가능
+        if is_admin or payment_user_id == user_id:
+            return payment
+        else:
+            raise NoPermssionError
+
+    def find(self, user_id: int):
+        return payment_repo.find_payment_with_transaction_by_user_id(user_id)
 
     def pay(
         self,
@@ -121,3 +153,153 @@ class PaymentService:
         else:
             # 결제 요청이 실패한 경우 request가 실패한 것으로 간주, db 반영과는 별도로 에러 response
             raise PaymentRequestFailedError()
+
+
+class OrderManagementService:
+    def __init__(self) -> None:
+        self.order_repo = OrderRepo()
+        self.order_delivery_repo = OrderDeliveryRepo()
+        self.product_out_repo = ProductOutRepo()
+        self.cart_repo = CartRepo()  # TODO 오타 수정
+
+    # Validation 체크 : 상품 출고
+    """
+    단일 품목으로 주문받는경우 수량은 productOut options에서 끌어오기
+    product repo에서 상품을 끌어오기
+
+    """
+
+    def _create_order(
+        self,
+        user_id: int,
+        delivery_fee: int,
+        trace_no: string,
+        customer_name: string,
+        customer_phone: string,
+        customer_email: string,
+        delivery_name: string,
+        delivery_phone: string,
+        delivery_memo: string,
+        zip_code: int,
+        address: string,
+        address_detail: string,
+    ) -> dict:
+        """
+        price 는 인수로 받지 않습니다. 장바구니에서 계산.
+        모든 권한이 접근 가능
+        """
+        # todo 장바구니 리스트 끌어오기 params : user_id
+        # TODO delivery 수정
+        data = {
+            "delivery_fee": delivery_fee,
+            "trace_no": trace_no,
+            "customer_name": customer_name,
+            "customer_phone": customer_phone,
+            "customer_email": customer_email,
+            "delivery_name": delivery_name,
+            "delivery_phone": delivery_phone,
+            "delivery_memo": delivery_memo,
+            "zip_code": zip_code,
+            "address": address,
+            "address_detail": address_detail,
+        }
+
+        params = OrderCreateReqSchema(data=data)
+        params.is_valid(raise_exception=True)
+
+        # cart repo에 리스트 요청
+        cart_list = self.cart_repo.get(user_id=user_id)
+
+        # cart 가격 합산
+        for cart in cart_list:
+            # price , options[amount]
+            price = cart["price"] * cart["options"]["amount"]
+            total_price = total_price + price
+
+        for cart in cart_list:
+            total_delivery_fee = total_delivery_fee + cart["dilivery_fee"]
+
+        # TODO Dilivery fee 수정 바랍니다.
+
+        # 필드별로 나누어서 저장
+        order = {
+            "user_id": user_id,
+            "price": total_price,
+            "dilivery_fee": total_delivery_fee,
+            "status": "C",  # status 조금
+        }
+        self.order_repo.create(order)
+
+        order_delivery = {
+            "customer_name": customer_name,
+            "customer_phone": customer_phone,
+            "customer_email": customer_email,
+            "delivery_name": delivery_name,
+            "delivery_phone": delivery_phone,
+            "delivery_memo": delivery_memo,
+            "zip_code": zip_code,
+            "address": address,
+            "address_detail": address_detail,
+        }
+        self.order_delivery_repo.create(order_delivery)
+        # status
+
+        # response
+        return order
+
+    def _get_order_list(
+        self,
+        order_id,
+        user_id,
+    ):
+        pass
+
+    def _get_order_detail(
+        self,
+        order_id,
+        user_id,
+    ) -> dict:
+        data = {"order_id": order_id, "user_id": user_id}
+        data = OrderGetReqSchema(data=data)
+        data.is_valid(raise_exception=True)
+        # 만약 로그인한 유저가 아닐경우 검증할 로직이 필요한지
+        #
+        get_order = self.order_repo.get_by_order_id(order_id=order_id)
+        get_delivery = self.order_delivery_repo.get(order_id=order_id)
+
+        get_data = {
+            "order_id": get_order["order_id"],
+            "price": get_order["price"],
+            # TODO 오타수정 delivery -> delivery
+            "delivery_fee": get_order["delivery_fee"],
+            "options": get_order["options"],
+            "status": get_order["status"],
+            "trace_no": get_delivery["trace_no"],
+            # 이하는 배송정보에 들어갈 내용
+            "customer_name": get_delivery["customer_name"],
+            "customer_phone": get_delivery["customer_phone"],
+            "delivery_name": get_delivery["delivery_name"],
+            "delivery_phone": get_delivery["delivery_phone"],
+            "delivery_memo": get_delivery["delivery_memo"],
+            "zip_code": get_delivery["zip_code"],
+            "address": get_delivery["address"],
+            "address_detail": get_delivery["address_detail"],
+        }
+        res = OrderResSchema(data=get_data)
+        res.is_valid(raise_exception=True)
+
+        return res
+
+    # def _get_order_list(user_id: int) -> list:
+    #     pass
+
+    def _deilvery_status_update(order_id: int, new_status: enum) -> dict:
+        order = order_repo.get_by_order_id(order_id=order_id)
+        order_status_now = order["status"]
+        order_status_new = new_status  # enum validation 작성
+
+        order["status"] = new_status
+        order_repo.update(order_id=order["order_id"])
+
+        res = {"order_id": order_id}
+        return res

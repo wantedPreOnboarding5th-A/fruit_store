@@ -10,15 +10,6 @@ from order.models import (
 from order.enums import PaymentType, CashReciptsType
 
 """
-직렬화를 담당
-Order, OrderPayment, OrderDelivery, ProductOut
-
-Detail page에 들어갈 정보 -> 단일만 조회  = OrderTransaction, OrderPayments
-
-조회시 일부 컬럼만 리스트로 직렬화 -> Order, #To-do
-"""
-
-"""
 단일 Order
 """
 
@@ -29,8 +20,70 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class OrderGetReqSchema(serializers.Serializer):
+    order_id: serializers.IntegerField()
+    user_id: serializers.IntegerField()
+
+
+class OrderCreateReqSchema(serializers.Serializer):
+    """
+    Service 기능 요청을 위한 주문 요청 scheme
+    """
+
+    # TODO 오타수정 delivery -> delivery
+    dilivery_fee = serializers.IntegerField()
+
+    # 이하는 배송정보에 들어갈 내용
+    trace_no = serializers.CharField()
+    customer_name = serializers.CharField()
+    customer_phone = serializers.CharField()
+    customer_email = serializers.CharField()
+    delivery_name = serializers.CharField()
+    delivery_phone = serializers.CharField()
+    delivery_memo = serializers.CharField()
+    zip_code = serializers.CharField()
+    address = serializers.CharField()
+    address_detail = serializers.CharField()
+
+
+class OrderResSchema(serializers.Serializer):
+    """
+    Service 기능 주문 응답 scheme
+    """
+
+    order_id = serializers.IntegerField()
+    price = serializers.IntegerField()
+    # TODO 오타수정 delivery -> delivery
+    dilivery_fee = serializers.IntegerField()
+    options = serializers.JSONField()
+    status = serializers.CharField()
+
+    # 이하는 배송정보에 들어갈 내용
+    trace_no = serializers.CharField()
+    customer_name = serializers.CharField()
+    customer_phone = serializers.CharField()
+    delivery_name = serializers.CharField()
+    delivery_phone = serializers.CharField()
+    delivery_memo = serializers.CharField()
+    zip_code = serializers.CharField()
+    address = serializers.CharField()
+    address_detail = serializers.CharField()
+
+
+class ProductOutReqSchema(serializers.Serializer):
+    """
+    Service 요청에 대한 출고정보 Scheme
+    """
+
+
+class OrderResSchema(serializers.Serializer):
+    """
+    Service 응답 에 대한 주문정보 Scheme
+    """
+
+
 """
-출고 테이블
+출고
 """
 
 
@@ -40,8 +93,22 @@ class ProductOutSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ProductOutReqSchema(serializers.Serializer):
+    """
+    Service 기능 요청을 위한 출고요청 scheme
+    """
+
+    product_id = serializers.IntegerField()
+    order_id = serializers.IntegerField()
+    price = serializers.IntegerField()
+    delivery_fee = serializers.IntegerField()
+    options = serializers.CharField()
+    status = serializers.CharField()
+    trace_no = serializers.CharField()
+
+
 """
-배송정보
+주문 요청 정의
 """
 
 
@@ -49,6 +116,12 @@ class OrderDeliverySerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDeilivery
         fields = "__all__"
+
+
+# class OrderDeliveryReqSchema(serializers.Serializer):
+#     """
+#     Service 기능 요청을 위한 배송정보 scheme
+#     """
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -109,12 +182,9 @@ class PayReqSchema(serializers.Serializer):
             if self._validate_deposit_pay_required():
                 return validated
             else:
-                if self._validate_deposit_pay_required():
-                    return validated
-                else:
-                    raise serializers.ValidationError(
-                        "deposit require cash_receipts_number, deposit_number, depositor"
-                    )
+                raise serializers.ValidationError(
+                    "deposit require cash_receipts_number, deposit_number, depositor"
+                )
 
 
 class PayResSchema(serializers.Serializer):
