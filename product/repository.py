@@ -207,7 +207,7 @@ class CartRepo:
                 data = {
                     "user": cart.user.id,
                     "price": cart.price,
-                    "dilivery_fee": 0 if cart.price >= 50000 else 5000,  # 50000원 이상 결제시 배송비 무료
+                    "delivery_fee": 0 if cart.price >= 50000 else 5000,  # 50000원 이상 결제시 배송비 무료
                     "status": OrderStatusType.PAID_CONFIRMD.value,  # order로 변경시 상태 코드 변경
                 }
                 serialize = self.orderserilaier(data=data)

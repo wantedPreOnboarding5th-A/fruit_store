@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now_add=True)),
                 ("price", models.PositiveIntegerField(default=0)),
-                ("dilivery_fee", models.PositiveIntegerField(default=0)),
+                ("delivery_fee", models.PositiveIntegerField(default=0)),
                 ("options", models.JSONField(default=dict)),
                 (
                     "product",

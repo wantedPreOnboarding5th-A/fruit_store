@@ -213,7 +213,7 @@ class OrderManagementService:
             total_price = total_price + price
 
         for cart in cart_list:
-            total_delivery_fee = total_delivery_fee + cart["dilivery_fee"]
+            total_delivery_fee = total_delivery_fee + cart["delivery_fee"]
 
         # TODO Dilivery fee 수정 바랍니다.
 
@@ -222,7 +222,7 @@ class OrderManagementService:
         order = {
             "user": user_id,
             "price": total_price,
-            "dilivery_fee": total_delivery_fee,
+            "delivery_fee": total_delivery_fee,
             "status": "C",  # status 조금
         }
         order_id = order_repo.create(order)["id"]
@@ -252,8 +252,7 @@ class OrderManagementService:
         get_data = {
             "order_id": get_order["id"],
             "price": get_order["price"],
-            # TODO 오타수정 delivery -> delivery
-            "dilivery_fee": get_order["dilivery_fee"],
+            "delivery_fee": get_order["delivery_fee"],
             "status": get_order["status"],
             # 이하는 배송정보에 들어갈 내용
             "customer_name": get_delivery["customer_name"],

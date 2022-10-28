@@ -10,19 +10,19 @@ class TestSerializer:
     def test_order_serializer(self):
         self.order_serializer = OrderSerializer
         order_serializer = self.order_serializer(
-            data={"user_id": 1, "price": 123, "dilivery_fee": 123, "status": "D"}
+            data={"user_id": 1, "price": 123, "delivery_fee": 123, "status": "D"}
         )
         assert order_serializer.is_valid()
         assert order_serializer.validated_data == {
             "user_id": 1,
             "price": 123,
-            "dilivery_fee": 123,
+            "delivery_fee": 123,
             "status": "D",
         }
         assert order_serializer.data == {
             "user_id": 1,
             "price": 123,
-            "dilivery_fee": 123,
+            "delivery_fee": 123,
             "status": "D",
         }
         assert order_serializer.errors == {}

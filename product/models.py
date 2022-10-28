@@ -81,7 +81,7 @@ class Cart(BaseModel):
         db_column="product_id",
     )
     price = models.PositiveIntegerField(null=False, default=0)
-    dilivery_fee = models.PositiveIntegerField(null=False, default=0)
+    delivery_fee = models.PositiveIntegerField(null=False, default=0)
     options = models.JSONField(null=False, default=dict)
 
     class Meta:
