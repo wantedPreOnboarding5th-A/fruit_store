@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now_add=True)),
                 ("price", models.IntegerField()),
-                ("dilivery_fee", models.IntegerField()),
+                ("delivery_fee", models.IntegerField()),
                 ("status", models.CharField(max_length=1)),
                 (
                     "user",
