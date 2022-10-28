@@ -11,7 +11,7 @@ from .service import ProductService, CartService
 from .serilaizers import ProductRegisterSchema, ProductListSchema
 from exceptions import NotFoundError
 from user.models import User
-from .exceptions import NotExistQueryParmeter
+from .exceptions import NotExistQueryParmeter, InvaildKey
 
 
 product_service = ProductService()
@@ -88,6 +88,9 @@ def pay_new_product(request):
         # 리스트 형태로 쿼리파라미터를 받음
         product_ids = request.GET.getlist("product_ids")
         
+        if not product_ids:
+            raise InvaildKey()
+
         # 유저의 장바구니에 있는 상품에 대한 id값
         cart_num = [str(cart.product.id) for cart in user.cart_set.all()]
 
@@ -115,6 +118,9 @@ def update_cart_items(request):
          # 쿼리파라미터를 받음
         product_id = request.GET.get("product_id")
         
+        if not product_id:
+            raise InvaildKey()
+
         # 유저의 장바구니에 있는 상품에 대한 id값
         cart_num = [str(cart.product.id) for cart in user.cart_set.all()]
 
@@ -140,6 +146,9 @@ def delete_cart_items(request):
         # 리스트 형태로 쿼리파라미터를 받음
         product_ids = request.GET.getlist("product_ids")
         
+        if not product_ids:
+            raise InvaildKey()
+
         # 유저의 장바구니에 있는 상품에 대한 id값
         cart_num = [str(cart.product.id) for cart in user.cart_set.all()]
         
