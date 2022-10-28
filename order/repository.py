@@ -114,32 +114,11 @@ class OrderRepo:
         """
         try:
             entity = self.model.objects.get(id=order_id)
-            # TODO 유효성 체크 id 동일한지
             serializer = self.serializer(entity, data=params, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except self.model.DoesNotExist:
             raise NotFoundError()
-
-        """
-        Deprecated : Order 삭제 대신 상태 컬럼 업데이트로 변경
-        """
-
-    def delete(
-        self,
-        order_id: int,
-    ):
-        """하위 엔티티에 전부 on_delete=models.CASCADE 가 걸려있으므로
-        다른 모델에는 delete 를 작성하지 않았음"""
-        try:
-            entity = self.model.objects.get(id=order_id)
-            entity.delete()
-            return True
-        except self.model.DoesNotExist:
-            raise NotFoundError()
-
-    def find_order():
-        pass
 
 
 """

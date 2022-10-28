@@ -20,11 +20,6 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class OrderGetReqSchema(serializers.Serializer):
-    order_id: serializers.IntegerField()
-    user_id: serializers.IntegerField()
-
-
 class OrderCreateReqSchema(serializers.Serializer):
     """
     Service 기능 요청을 위한 주문 요청 scheme
@@ -70,58 +65,16 @@ class OrderResSchema(serializers.Serializer):
     address_detail = serializers.CharField()
 
 
-class ProductOutReqSchema(serializers.Serializer):
-    """
-    Service 요청에 대한 출고정보 Scheme
-    """
-
-
-class OrderResSchema(serializers.Serializer):
-    """
-    Service 응답 에 대한 주문정보 Scheme
-    """
-
-
-"""
-출고
-"""
-
-
 class ProductOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOut
         fields = "__all__"
 
 
-class ProductOutReqSchema(serializers.Serializer):
-    """
-    Service 기능 요청을 위한 출고요청 scheme
-    """
-
-    product_id = serializers.IntegerField()
-    order_id = serializers.IntegerField()
-    price = serializers.IntegerField()
-    delivery_fee = serializers.IntegerField()
-    options = serializers.CharField()
-    status = serializers.CharField()
-    trace_no = serializers.CharField()
-
-
-"""
-주문 요청 정의
-"""
-
-
 class OrderDeliverySerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDeilivery
         fields = "__all__"
-
-
-# class OrderDeliveryReqSchema(serializers.Serializer):
-#     """
-#     Service 기능 요청을 위한 배송정보 scheme
-#     """
 
 
 class TransactionSerializer(serializers.ModelSerializer):
