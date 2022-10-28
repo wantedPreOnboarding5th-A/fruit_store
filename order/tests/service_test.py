@@ -1,6 +1,8 @@
-from order.service import PaymentService
+from order.repository import OrderRepo
 import pytest
 from django.conf import settings
+
+from order.service import PaymentService
 
 payment_service = PaymentService()
 

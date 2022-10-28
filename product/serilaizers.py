@@ -38,9 +38,7 @@ class ProductRegisterSchema(serializers.Serializer):
     """
 
     name = serializers.CharField(max_length=80)
-    sale_status = serializers.CharField(max_length=1)
-    is_sale = serializers.IntegerField()
-    desc_context = serializers.CharField(max_length=1024)
+    desc_context = serializers.TextField()  # serializers에 TextField가 존재하지 않음
     package = serializers.CharField(max_length=50)
     producer = serializers.CharField(max_length=100)
     product_date = serializers.DateField()
@@ -63,8 +61,7 @@ class ProductListSchema(serializers.Serializer):
     name = serializers.CharField(max_length=80)
     sale_status = serializers.CharField(max_length=1)
     is_sale = serializers.IntegerField()
-    thumbnail = serializers.CharField(max_length=255)
-    price = serializers.IntegerField()
+    price = serializers.PositiveIntegerField()  # serializers에 PositiveIntegerField가 존재하지 않음
 
 
 """

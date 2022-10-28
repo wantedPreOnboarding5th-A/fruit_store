@@ -10,7 +10,6 @@ from order.repository import (
 from exceptions import NotFoundError
 from order.serializers import (
     OrderCreateReqSchema,
-    OrderGetReqSchema,
     OrderResSchema,
     PayReqSchema,
     PayResSchema,
@@ -62,9 +61,7 @@ class PaymentService:
         }
         payment.pop("order")
 
-        transaction = exclude_by_keys(
-            set(["id", "created_at", "updated_at"]), transaction
-        )
+        transaction = exclude_by_keys(set(["id", "created_at", "updated_at"]), transaction)
         serializer = PayResSchema(data={**data, **payment, **transaction})
         serializer.is_valid(raise_exception=True)
         return serializer.data
@@ -147,9 +144,7 @@ class PaymentService:
             },
         )
         if is_success:
-            return self._parse_payment_with_transaction(
-                transaction=transaction, payment=payment
-            )
+            return self._parse_payment_with_transaction(transaction=transaction, payment=payment)
         else:
             # 결제 요청이 실패한 경우 request가 실패한 것으로 간주, db 반영과는 별도로 에러 response
             raise PaymentRequestFailedError()
@@ -168,7 +163,7 @@ class OrderManagementService:
     product repo에서 상품을 끌어오기
 
     """
-
+    # upsert 으로
     def _create_order(
         self,
         user_id: int,
@@ -259,11 +254,6 @@ class OrderManagementService:
         order_id,
         user_id,
     ) -> dict:
-        data = {"order_id": order_id, "user_id": user_id}
-        data = OrderGetReqSchema(data=data)
-        data.is_valid(raise_exception=True)
-        # 만약 로그인한 유저가 아닐경우 검증할 로직이 필요한지
-        #
         get_order = self.order_repo.get_by_order_id(order_id=order_id)
         get_delivery = self.order_delivery_repo.get(order_id=order_id)
 
@@ -290,8 +280,10 @@ class OrderManagementService:
 
         return res
 
-    # def _get_order_list(user_id: int) -> list:
-    #     pass
+    def _get_order_list(user_id: int) -> list:
+        """user_id 를 인수로 받아서 해당 유저의 주문목록을 리턴"""
+        """리스트 구현?"""
+        pass
 
     def _deilvery_status_update(order_id: int, new_status: enum) -> dict:
         order = order_repo.get_by_order_id(order_id=order_id)
