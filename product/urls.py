@@ -1,10 +1,9 @@
 from django.urls import path
 
-from product.controller import create, delete, get_detail, get_list
+from product.controller import ProcuctAPI, get_list
 
 urlpatterns = [
-    path("register/", create),
-    path("list/", get_list),
-    path("detail/", get_detail),
-    path("delete/", delete),
+    path("product/", ProcuctAPI.as_view()),
+    path("product/<int:product_id>", ProcuctAPI.as_view()),
+    path("product/list", get_list),
 ]

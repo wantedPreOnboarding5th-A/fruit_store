@@ -11,30 +11,30 @@ from order.models import Order
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        field = "__all__"
+        fields = "__all__"
 
 
 class ProductDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductDescription
-        field = "__all__"
+        fields = "__all__"
 
 
 class ProductImgSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImg
-        field = "__all__"
+        fields = "__all__"
 
 
 class ProductOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductOption
-        field = "__all__"
+        fields = "__all__"
 
 
 class ProductRegisterSchema(serializers.Serializer):
     """
-    상품 등록 및 상세 조회 기능 요청에 필요한 파라미터 정의
+    상품 등록 기능 요청에 필요한 파라미터 정의
     """
 
     name = serializers.CharField(max_length=80)
@@ -51,7 +51,7 @@ class ProductRegisterSchema(serializers.Serializer):
     contact = serializers.CharField(max_length=100)
     thumbnail = serializers.CharField(max_length=255)
     detail_img = serializers.JSONField()
-    options = serializers.CharField(max_length=50)
+    options = serializers.JSONField()
     price = serializers.IntegerField()
 
 

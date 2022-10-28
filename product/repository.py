@@ -16,28 +16,84 @@ class ProductRepo:
         self.model = Product
         self.serializer = ProductSerializer
 
-    def get(self) -> dict:
+    def get_list(self) -> dict:
         try:
-            return self.serializer(self.model.objects.all()).data
+            products = self.model.objects.all()
+
+            res = [
+                {
+                    "id": product.id,
+                    "name": product.name,
+                    "sale_status": product.sale_status,
+                    "is_sale": product.is_sale,
+                    "price": product.productoption_set.get().price,
+                    "thumbnail": product.productimg_set.get().thumbnail,
+                }
+                for product in products
+            ]
+
+            return {"res": res}
         except self.model.DoesNotExist:
             raise NotFoundError
 
     def get_by_product_id(self, product_id: int) -> dict:
         try:
-            return self.serializer(self.model.objects.get(id=product_id)).data
+            product = self.model.objects.get(id=product_id)
+            product_options = ProductOption.objects.filter(product_id=product_id)
+
+            options = [
+                {
+                    "options": option.options,
+                    "price": option.price,
+                }
+                for option in product_options
+            ]
+
+            res = {
+                "id": product.id,
+                "name": product.name,
+                "sale_status": product.sale_status,
+                "is_sale": product.is_sale,
+                "desc_context": product.desc_context,
+                "options_price": options,
+                "package": product.productdescription_set.get().package,
+                "producer": product.productdescription_set.get().producer,
+                "product_date": product.productdescription_set.get().product_date,
+                "expire_date": product.productdescription_set.get().expire_date,
+                "law_info": product.productdescription_set.get().law_info,
+                "description": product.productdescription_set.get().description,
+                "storage_method": product.productdescription_set.get().storage_method,
+                "contact": product.productdescription_set.get().contact,
+                "thumbnail": product.productimg_set.get().thumbnail,
+                "detail_img": product.productimg_set.get().detail_img,
+            }
+
+            return res
         except self.model.DoesNotExist:
             raise NotFoundError
 
-    def upsert(self, data: dict) -> dict:
-        obj, created = self.model.objects.update_or_create(
-            defaults=data,
+    def create(self, data: dict) -> dict:
+        created = self.model.objects.create(
+            name=data["name"],
+            sale_status=data["sale_status"],
+            is_sale=data["is_sale"],
+            desc_context=data["desc_context"],
         )
-        return self.serializer(obj).data
+        return created
+
+    def update(self, data: dict, product_id: int) -> dict:
+        updated = self.model.objects.filter(id=product_id).update(
+            name=data["name"],
+            sale_status=data["sale_status"],
+            is_sale=data["is_sale"],
+            desc_context=data["desc_context"],
+        )
+        return updated
 
     def delete(self, product_id: int):
         entity = self.model.objects.get(id=product_id)
         entity.delete()
-        return True
+        return "delete"
 
 
 class ProductDescriptionRepo:
@@ -45,17 +101,33 @@ class ProductDescriptionRepo:
         self.model = ProductDescription
         self.serializer = ProductDescriptionSerializer
 
-    def get_by_product_id(self, product_id: int) -> dict:
-        try:
-            return self.serializer(self.model.objects.get(id=product_id)).data
-        except self.model.DoesNotExist:
-            raise NotFoundError
-
-    def upsert(self, data: dict) -> dict:
-        obj, created = self.model.objects.update_or_create(
-            defaults=data,
+    def create(self, data: dict) -> dict:
+        created = self.model.objects.create(
+            product_id=data["product_id"],
+            package=data["package"],
+            producer=data["producer"],
+            product_date=data["product_date"],
+            expire_date=data["expire_date"],
+            law_info=data["law_info"],
+            description=data["description"],
+            storage_method=data["storage_method"],
+            contact=data["contact"],
         )
-        return self.serializer(obj).data
+        return self.serializer(created).data
+
+    def update(self, data: dict, product_id: int) -> dict:
+        updated = self.model.objects.filter(id=product_id).update(
+            product_id=data["product_id"],
+            package=data["package"],
+            producer=data["producer"],
+            product_date=data["product_date"],
+            expire_date=data["expire_date"],
+            law_info=data["law_info"],
+            description=data["description"],
+            storage_method=data["storage_method"],
+            contact=data["contact"],
+        )
+        return updated
 
 
 class ProductImgRepo:
@@ -63,23 +135,21 @@ class ProductImgRepo:
         self.model = ProductImg
         self.serializer = ProductImgSerializer
 
-    def get(self) -> dict:
-        try:
-            return self.serializer(self.model.objects.all()).data
-        except self.model.DoesNotExist:
-            raise NotFoundError
-
-    def get_by_product_id(self, product_id: int) -> dict:
-        try:
-            return self.serializer(self.model.objects.get(id=product_id)).data
-        except self.model.DoesNotExist:
-            raise NotFoundError
-
-    def upsert(self, data: dict) -> dict:
-        obj, created = self.model.objects.update_or_create(
-            defaults=data,
+    def create(self, data: dict) -> dict:
+        created = self.model.objects.create(
+            product_id=data["product_id"],
+            thumbnail=data["thumbnail"],
+            detail_img=data["detail_img"],
         )
-        return self.serializer(obj).data
+        return self.serializer(created).data
+
+    def update(self, data: dict, product_id: int) -> dict:
+        updated = self.model.objects.filter(id=product_id).update(
+            product_id=data["product_id"],
+            thumbnail=data["thumbnail"],
+            detail_img=data["detail_img"],
+        )
+        return updated
 
 
 class ProductOptionRepo:
@@ -87,23 +157,21 @@ class ProductOptionRepo:
         self.model = ProductOption
         self.serializer = ProductOptionSerializer
 
-    def get(self) -> dict:
-        try:
-            return self.serializer(self.model.objects.all()).data
-        except self.model.DoesNotExist:
-            raise NotFoundError
-
-    def get_by_product_id(self, product_id: int) -> dict:
-        try:
-            return self.serializer(self.model.objects.get(id=product_id)).data
-        except self.model.DoesNotExist:
-            raise NotFoundError
-
-    def upsert(self, data: dict) -> dict:
-        obj, created = self.model.objects.update_or_create(
-            defaults=data,
+    def create(self, data: dict) -> dict:
+        created = self.model.objects.create(
+            product_id=data["product_id"],
+            options=data["options"],
+            price=data["price"],
         )
-        return self.serializer(obj).data
+        return self.serializer(created).data
+
+    def update(self, data: dict, product_id: int) -> dict:
+        updated = self.model.objects.filter(id=product_id).update(
+            product_id=data["product_id"],
+            options=data["options"],
+            price=data["price"],
+        )
+        return updated
 
 
 class CartPepo:  # TODO 오타 수정
