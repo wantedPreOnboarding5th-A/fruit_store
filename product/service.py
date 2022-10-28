@@ -101,6 +101,8 @@ class ProductService:
         }
         self.product_img_repo.upsert(product_image)
 
+        return product
+
     def get_list(self) -> dict:
         """상품 리스트 페이지에 표시해야할 데이터 반환"""
         res_1 = self.product_repo.get()
